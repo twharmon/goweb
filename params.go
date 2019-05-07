@@ -1,19 +1,16 @@
-package gorouter
+package goweb
 
-// Param .
-type Param struct {
-	Key   string
-	Value string
+type param struct {
+	key   string
+	value string
 }
 
-// Params .
-type Params []*Param
+type params []param
 
-// Get .
-func (ps Params) Get(key string) string {
+func (ps params) get(key string) string {
 	for i := range ps {
-		if ps[i].Key == key {
-			return ps[i].Value
+		if ps[i].key == key {
+			return ps[i].value
 		}
 	}
 	return ""
