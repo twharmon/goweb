@@ -18,9 +18,25 @@ type Context struct {
 	engine  *Engine
 }
 
+// Status returns a Response with the given status.
+func (c *Context) Status(status int) *Response {
+	c.writer.WriteHeader(status)
+	return &Response{
+		context: c,
+	}
+}
+
 // OK returns a Response with status 200.
 func (c *Context) OK() *Response {
 	c.writer.WriteHeader(http.StatusOK)
+	return &Response{
+		context: c,
+	}
+}
+
+// Unauthorized returns a Response with status 401.
+func (c *Context) Unauthorized() *Response {
+	c.writer.WriteHeader(http.StatusUnauthorized)
 	return &Response{
 		context: c,
 	}
@@ -37,6 +53,30 @@ func (c *Context) Forbidden() *Response {
 // NotFound returns a Response with status 404.
 func (c *Context) NotFound() *Response {
 	c.writer.WriteHeader(http.StatusNotFound)
+	return &Response{
+		context: c,
+	}
+}
+
+// Conflict returns a Response with status 409.
+func (c *Context) Conflict() *Response {
+	c.writer.WriteHeader(http.StatusConflict)
+	return &Response{
+		context: c,
+	}
+}
+
+// UnprocessableEntity returns a Response with status 422.
+func (c *Context) UnprocessableEntity() *Response {
+	c.writer.WriteHeader(http.StatusUnprocessableEntity)
+	return &Response{
+		context: c,
+	}
+}
+
+// InternalServerError returns a Response with status 500.
+func (c *Context) InternalServerError() *Response {
+	c.writer.WriteHeader(http.StatusInternalServerError)
 	return &Response{
 		context: c,
 	}
