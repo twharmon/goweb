@@ -329,4 +329,8 @@ func ExampleContext_Param() {
 	app := goweb.New()
 	app.GET("/hello/{name}", handler)
 	app.Run(":8080")
+
+	// Output:
+	// // GET /hello/Gopher
+	// Gopher
 }
