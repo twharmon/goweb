@@ -34,6 +34,14 @@ func (c *Context) OK() *Response {
 	}
 }
 
+// BadRequest returns a Response with status 400.
+func (c *Context) BadRequest() *Response {
+	c.writer.WriteHeader(http.StatusBadRequest)
+	return &Response{
+		context: c,
+	}
+}
+
 // Unauthorized returns a Response with status 401.
 func (c *Context) Unauthorized() *Response {
 	c.writer.WriteHeader(http.StatusUnauthorized)
@@ -109,6 +117,27 @@ func (c *Context) Get(key string) interface{} {
 // ParseJSON parses the request body into the given target.
 func (c *Context) ParseJSON(target interface{}) error {
 	return jsoniter.NewDecoder(c.request.Body).Decode(target)
+}
+
+// Host returns the requested host.
+func (c *Context) Host(key string) string {
+	return c.request.Host
+}
+
+// RequestHeader returns a request header by the given key.
+func (c *Context) RequestHeader(key string) string {
+	return c.request.Header.Get(key)
+}
+
+// ResponseHeader returns a Response header by the given
+// key.
+func (c *Context) ResponseHeader(key string) string {
+	return c.writer.Header().Get(key)
+}
+
+// SetHeader sets a Response header.
+func (c *Context) SetHeader(key string, value string) {
+	c.writer.Header().Set(key, value)
 }
 
 // SetCookie adds a Set-Cookie header to response.

@@ -29,15 +29,13 @@ func (r *Response) PlainText(text string) *Response {
 	return r
 }
 
-func (r *Response) send() error {
+func (r *Response) send() {
 	if r.body != nil {
 		switch r.context.writer.Header().Get(contentTypeHeader) {
 		case contentTypeApplicationJSON:
-			return jsoniter.NewEncoder(r.context.writer).Encode(r.body)
+			jsoniter.NewEncoder(r.context.writer).Encode(r.body)
 		case contentTypeTextPlain:
-			_, err := r.context.writer.Write([]byte(r.body.(string)))
-			return err
+			r.context.writer.Write([]byte(r.body.(string)))
 		}
 	}
-	return nil
 }
