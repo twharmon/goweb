@@ -54,11 +54,8 @@ func getTitleAndColor(level int) (string, string) {
 		return "Critical", "danger"
 	case LogLevelAlert:
 		return "Alert", "danger"
-	case LogLevelEmergency:
-		return "Emergency", "danger"
-	default:
-		return "", ""
 	}
+	return "Emergency", "danger"
 }
 
 func caller() string {

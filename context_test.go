@@ -320,3 +320,163 @@ func TestLogPassthrough(t *testing.T) {
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, "")
 }
+
+func TestStdLoggerDebug(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogDebug(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelDebug)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Debug: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerInfo(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogInfo(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelInfo)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Info: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerNotice(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogNotice(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelNotice)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Notice: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerWarning(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogWarning(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelWarning)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Warning: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerError(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogError(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelError)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Error: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerAlert(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogAlert(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelAlert)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Alert: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerCritical(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogCritical(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelCritical)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Critical: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}
+
+func TestStdLoggerEmergency(t *testing.T) {
+	logMsg := "test log message"
+	handler := func(c *goweb.Context) *goweb.Response {
+		c.LogEmergency(logMsg)
+		return c.OK()
+	}
+	app := goweb.New()
+	app.AddStdLogger(goweb.LogLevelEmergency)
+	app.GET("/", handler)
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	app.ServeHTTP(httptest.NewRecorder(), req)
+	got := stdLoggerOut.String()
+	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Emergency: ") {
+		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
+	}
+}

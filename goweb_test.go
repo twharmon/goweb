@@ -26,6 +26,13 @@ func (l *testLogger) Log(level int, msg interface{}) {
 	l.log.Print(msg)
 }
 
+var stdLoggerOut bytes.Buffer
+
+func init() {
+	log.SetOutput(&stdLoggerOut)
+	log.SetFlags(0)
+}
+
 func newLogger(level int) *testLogger {
 	l := new(testLogger)
 	l.level = level
