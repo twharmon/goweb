@@ -120,24 +120,18 @@ func (c *Context) ParseJSON(target interface{}) error {
 }
 
 // Host returns the requested host.
-func (c *Context) Host(key string) string {
+func (c *Context) Host() string {
 	return c.request.Host
 }
 
-// RequestHeader returns a request header by the given key.
-func (c *Context) RequestHeader(key string) string {
-	return c.request.Header.Get(key)
+// RequestHeader returns the request header.
+func (c *Context) RequestHeader() http.Header {
+	return c.request.Header
 }
 
-// ResponseHeader returns a Response header by the given
-// key.
-func (c *Context) ResponseHeader(key string) string {
-	return c.writer.Header().Get(key)
-}
-
-// SetHeader sets a Response header.
-func (c *Context) SetHeader(key string, value string) {
-	c.writer.Header().Set(key, value)
+// ResponseHeader returns the Response header.
+func (c *Context) ResponseHeader() http.Header {
+	return c.writer.Header()
 }
 
 // SetCookie adds a Set-Cookie header to response.

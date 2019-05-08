@@ -1,7 +1,9 @@
 package goweb_test
 
 import (
+	"crypto/tls"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -14,7 +16,7 @@ func TestGET(t *testing.T) {
 	}
 	app := goweb.New()
 	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, http.StatusOK, "")
+	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestPUT(t *testing.T) {
@@ -23,7 +25,7 @@ func TestPUT(t *testing.T) {
 	}
 	app := goweb.New()
 	app.PUT("/", handler)
-	assert(t, app, "PUT", "/", nil, http.StatusOK, "")
+	assert(t, app, "PUT", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestPATCH(t *testing.T) {
@@ -32,7 +34,7 @@ func TestPATCH(t *testing.T) {
 	}
 	app := goweb.New()
 	app.PATCH("/", handler)
-	assert(t, app, "PATCH", "/", nil, http.StatusOK, "")
+	assert(t, app, "PATCH", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestPOST(t *testing.T) {
@@ -41,7 +43,7 @@ func TestPOST(t *testing.T) {
 	}
 	app := goweb.New()
 	app.POST("/", handler)
-	assert(t, app, "POST", "/", nil, http.StatusOK, "")
+	assert(t, app, "POST", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestDELETE(t *testing.T) {
@@ -50,7 +52,7 @@ func TestDELETE(t *testing.T) {
 	}
 	app := goweb.New()
 	app.DELETE("/", handler)
-	assert(t, app, "DELETE", "/", nil, http.StatusOK, "")
+	assert(t, app, "DELETE", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestOPTIONS(t *testing.T) {
@@ -59,7 +61,7 @@ func TestOPTIONS(t *testing.T) {
 	}
 	app := goweb.New()
 	app.OPTIONS("/", handler)
-	assert(t, app, "OPTIONS", "/", nil, http.StatusOK, "")
+	assert(t, app, "OPTIONS", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestHEAD(t *testing.T) {
@@ -68,7 +70,7 @@ func TestHEAD(t *testing.T) {
 	}
 	app := goweb.New()
 	app.HEAD("/", handler)
-	assert(t, app, "HEAD", "/", nil, http.StatusOK, "")
+	assert(t, app, "HEAD", "/", nil, nil, http.StatusOK, "")
 }
 
 func TestRouteNotFound(t *testing.T) {
@@ -77,7 +79,7 @@ func TestRouteNotFound(t *testing.T) {
 	}
 	app := goweb.New()
 	app.GET("/", handler)
-	assert(t, app, "GET", "/foo", nil, http.StatusNotFound, "Page not found")
+	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "Page not found")
 }
 
 func TestCustomNotFound(t *testing.T) {
@@ -89,7 +91,7 @@ func TestCustomNotFound(t *testing.T) {
 	app.NotFound(func(c *goweb.Context) *goweb.Response {
 		return c.NotFound()
 	})
-	assert(t, app, "GET", "/foo", nil, http.StatusNotFound, "")
+	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "")
 }
 
 func TestEmptyPath(t *testing.T) {
@@ -119,5 +121,52 @@ func TestParams(t *testing.T) {
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)
-	assert(t, app, "GET", "/hello/Gopher/5", nil, http.StatusOK, "Gopher 5")
+	assert(t, app, "GET", "/hello/Gopher/5", nil, nil, http.StatusOK, "Gopher 5")
+}
+
+func TestParamsNotFound(t *testing.T) {
+	handler := func(c *goweb.Context) *goweb.Response {
+		res := fmt.Sprintf("%s %s", c.Param("name_"), c.Param("age"))
+		return c.OK().PlainText(res)
+	}
+	app := goweb.New()
+	app.GET("/hello/{name}/{age}", handler)
+	assert(t, app, "GET", "/hello/Gopher/5", nil, nil, http.StatusOK, " 5")
+}
+
+func TestNoWWW(t *testing.T) {
+	handler := func(c *goweb.Context) *goweb.Response {
+		return c.OK()
+	}
+	app := goweb.New()
+	app.NoWWW()
+	app.GET("/", handler)
+	transformer := func(r *http.Request) {
+		r.Host = "www.example.com"
+	}
+	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"http://example.com/\">Moved Permanently</a>.\n\n")
+}
+
+func TestNoWWWTLS(t *testing.T) {
+	handler := func(c *goweb.Context) *goweb.Response {
+		return c.OK()
+	}
+	app := goweb.New()
+	app.NoWWW()
+	app.GET("/", handler)
+	transformer := func(r *http.Request) {
+		r.Host = "www.example.com"
+		r.TLS = &tls.ConnectionState{}
+	}
+	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"https://example.com/\">Moved Permanently</a>.\n\n")
+}
+
+func TestServeFiles(t *testing.T) {
+	app := goweb.New()
+	app.ServeFiles("/", ".")
+	b, err := ioutil.ReadFile("./README.md")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert(t, app, "GET", "/README.md", nil, nil, http.StatusOK, string(b))
 }

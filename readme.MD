@@ -58,3 +58,5 @@ func getUser(c *goweb.Context) *goweb.Response {
 	return c.OK().JSON(c.Get("user").(*User))
 }
 ```
+
+

@@ -133,10 +133,16 @@ func (e *Engine) NotFound(handler Handler) {
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if e.noWWW && strings.HasPrefix(r.Host, "www.") {
 		w.Header().Set("Connection", "close")
+		var scheme string
+		if r.TLS == nil {
+			scheme = "http"
+		} else {
+			scheme = "https"
+		}
 		http.Redirect(
 			w,
 			r,
-			"https://"+strings.TrimPrefix(r.Host, "www.")+r.URL.String(),
+			scheme+"://"+strings.TrimPrefix(r.Host, "www.")+r.URL.String(),
 			http.StatusMovedPermanently,
 		)
 		return

@@ -18,7 +18,7 @@ func TestPassThroughMiddleware(t *testing.T) {
 		return nil
 	})
 	app.GET("/", mw.Apply(handler))
-	assert(t, app, "GET", "/", nil, http.StatusOK, "bar")
+	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "bar")
 }
 
 func TestInterruptingMiddleware(t *testing.T) {
@@ -31,5 +31,5 @@ func TestInterruptingMiddleware(t *testing.T) {
 		return c.BadRequest()
 	})
 	app.GET("/", mw.Apply(handler))
-	assert(t, app, "GET", "/", nil, http.StatusBadRequest, "")
+	assert(t, app, "GET", "/", nil, nil, http.StatusBadRequest, "")
 }
