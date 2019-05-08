@@ -3,7 +3,9 @@ package goweb_test
 import (
 	"crypto/tls"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 
 	"goweb"
@@ -70,6 +72,18 @@ func TestHEAD(t *testing.T) {
 	app := goweb.New()
 	app.HEAD("/", handler)
 	assert(t, app, "HEAD", "/", nil, nil, http.StatusOK, "")
+}
+
+func TestServeFiles(t *testing.T) {
+	content := "test file contents"
+	data := []byte(content)
+	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
+		t.Error(err)
+	}
+	app := goweb.New()
+	app.ServeFiles("/", ".")
+	assert(t, app, "GET", "/test.txt", nil, nil, http.StatusOK, content)
+	os.Remove("./test.txt")
 }
 
 func TestRouteNotFound(t *testing.T) {
