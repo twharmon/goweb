@@ -320,17 +320,3 @@ func TestLogPassthrough(t *testing.T) {
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, "")
 }
-
-func ExampleContext_Param() {
-	handler := func(c *goweb.Context) *goweb.Response {
-		name := c.Param("name")
-		return c.OK().PlainText(name)
-	}
-	app := goweb.New()
-	app.GET("/hello/{name}", handler)
-	app.Run(":8080")
-
-	// Output:
-	// // GET /hello/Gopher
-	// Gopher
-}
