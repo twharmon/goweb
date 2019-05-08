@@ -1,4 +1,4 @@
-# Goweb
+# Goweb [![Build Status](https://travis-ci.com/twharmon/goweb.svg?branch=master)](https://travis-ci.com/twharmon/goweb) [![Coverage Status](https://coveralls.io/repos/github/twharmon/goweb/badge.svg?branch=master)](https://coveralls.io/github/twharmon/goweb?branch=master)
 Light weight web framework based on net/http.
 
 ## Usage
