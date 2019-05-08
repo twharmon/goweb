@@ -3,7 +3,6 @@ package goweb_test
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -159,14 +158,4 @@ func TestNoWWWTLS(t *testing.T) {
 		r.TLS = &tls.ConnectionState{}
 	}
 	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"https://example.com/\">Moved Permanently</a>.\n\n")
-}
-
-func TestServeFiles(t *testing.T) {
-	app := goweb.New()
-	app.ServeFiles("/", ".")
-	b, err := ioutil.ReadFile("./README.md")
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert(t, app, "GET", "/README.md", nil, nil, http.StatusOK, string(b))
 }
