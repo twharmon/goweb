@@ -1,4 +1,4 @@
-module goweb
+module github.com/twharmon/goweb
 
 go 1.12
 
