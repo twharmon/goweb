@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"goweb"
+	"github.com/twharmon/goweb"
 )
 
 func TestPassThroughMiddleware(t *testing.T) {

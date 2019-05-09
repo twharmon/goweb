@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"goweb"
+	"github.com/twharmon/goweb"
 )
 
 func TestGET(t *testing.T) {

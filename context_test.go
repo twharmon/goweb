@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"goweb"
+	"github.com/twharmon/goweb"
 )
 
 func TestStatus(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"goweb"
+	"github.com/twharmon/goweb"
 )
 
 type testLogger struct {
