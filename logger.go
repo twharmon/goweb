@@ -31,10 +31,9 @@ const (
 	LogLevelEmergency
 )
 
-// Logger outputs messages with Log() if ShouldLog()
-// returns true.
+// Logger is an interface that implements
+// Log(level int, message interface{}).
 type Logger interface {
-	ShouldLog(level int) bool
 	Log(level int, message interface{})
 }
 

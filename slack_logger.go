@@ -10,25 +10,23 @@ import (
 )
 
 type slackLogger struct {
-	level int
-}
-
-func (l *slackLogger) ShouldLog(level int) bool {
-	return level >= l.level
+	minLevel int
 }
 
 func (l *slackLogger) Log(level int, message interface{}) {
-	title, color := getTitleAndColor(level)
-	req, err := makeSlackRequest(Map{
-		"color": color,
-		"title": title,
-		"text":  fmt.Sprintf("%s - %s", caller(), message),
-	})
-	if err != nil {
-		log.Println(err)
-		return
+	if level >= l.minLevel {
+		title, color := getTitleAndColor(level)
+		req, err := makeSlackRequest(Map{
+			"color": color,
+			"title": title,
+			"text":  fmt.Sprintf("%s - %s", caller(), message),
+		})
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		go sendSlackRequest(req)
 	}
-	go sendSlackRequest(req)
 }
 
 func makeSlackRequest(m Map) (*http.Request, error) {

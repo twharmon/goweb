@@ -10,7 +10,7 @@ import (
 )
 
 func TestStatus(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Status(-1)
 	}
 	app := goweb.New()
@@ -19,7 +19,7 @@ func TestStatus(t *testing.T) {
 }
 
 func TestOK(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -28,7 +28,7 @@ func TestOK(t *testing.T) {
 }
 
 func TestBadRequest(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.BadRequest()
 	}
 	app := goweb.New()
@@ -37,7 +37,7 @@ func TestBadRequest(t *testing.T) {
 }
 
 func TestUnauthorized(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Unauthorized()
 	}
 	app := goweb.New()
@@ -46,7 +46,7 @@ func TestUnauthorized(t *testing.T) {
 }
 
 func TestForbidden(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Forbidden()
 	}
 	app := goweb.New()
@@ -55,7 +55,7 @@ func TestForbidden(t *testing.T) {
 }
 
 func TestNotFound(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.NotFound()
 	}
 	app := goweb.New()
@@ -64,7 +64,7 @@ func TestNotFound(t *testing.T) {
 }
 
 func TestConflict(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Conflict()
 	}
 	app := goweb.New()
@@ -73,7 +73,7 @@ func TestConflict(t *testing.T) {
 }
 
 func TestUnprocessableEntity(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.UnprocessableEntity()
 	}
 	app := goweb.New()
@@ -82,7 +82,7 @@ func TestUnprocessableEntity(t *testing.T) {
 }
 
 func TestInternalServerError(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.InternalServerError()
 	}
 	app := goweb.New()
@@ -91,7 +91,7 @@ func TestInternalServerError(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK().PlainText(c.Query("foo"))
 	}
 	app := goweb.New()
@@ -103,7 +103,7 @@ func TestJSON(t *testing.T) {
 	type Msg struct {
 		Hello string `json:"hello"`
 	}
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK().JSON(&Msg{
 			Hello: "world",
 		})
@@ -119,7 +119,7 @@ func TestParseJSON(t *testing.T) {
 		Hello string `json:"hello"`
 	}
 	body := "{\"hello\":\"world\"}\n"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		var msg Msg
 		if err := c.ParseJSON(&msg); err != nil {
 			return c.BadRequest()
@@ -132,7 +132,7 @@ func TestParseJSON(t *testing.T) {
 }
 
 func TestHost(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK().PlainText(c.Host())
 	}
 	app := goweb.New()
@@ -145,7 +145,7 @@ func TestHost(t *testing.T) {
 }
 
 func TestRequestHeader(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK().PlainText(c.RequestHeader().Get("foo"))
 	}
 	app := goweb.New()
@@ -157,7 +157,7 @@ func TestRequestHeader(t *testing.T) {
 }
 
 func TestResponseHeader(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.ResponseHeader().Set("foo", "bar")
 		return c.OK().PlainText(c.ResponseHeader().Get("foo"))
 	}
@@ -167,7 +167,7 @@ func TestResponseHeader(t *testing.T) {
 }
 
 func TestCookie(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		cookie, err := c.Cookie("foo")
 		if err != nil {
 			return c.BadRequest()
@@ -183,7 +183,7 @@ func TestCookie(t *testing.T) {
 }
 
 func TestSetCookie(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.SetCookie(&http.Cookie{
 			Name:  "foo",
 			Value: "bar",
@@ -207,7 +207,7 @@ func TestSetCookie(t *testing.T) {
 
 func TestLogDebug(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogDebug(logMsg)
 		return c.OK()
 	}
@@ -220,7 +220,7 @@ func TestLogDebug(t *testing.T) {
 
 func TestLogInfo(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogInfo(logMsg)
 		return c.OK()
 	}
@@ -233,7 +233,7 @@ func TestLogInfo(t *testing.T) {
 
 func TestLogNotice(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogNotice(logMsg)
 		return c.OK()
 	}
@@ -246,7 +246,7 @@ func TestLogNotice(t *testing.T) {
 
 func TestLogWarning(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogWarning(logMsg)
 		return c.OK()
 	}
@@ -259,7 +259,7 @@ func TestLogWarning(t *testing.T) {
 
 func TestLogError(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogError(logMsg)
 		return c.OK()
 	}
@@ -272,7 +272,7 @@ func TestLogError(t *testing.T) {
 
 func TestLogAlert(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogAlert(logMsg)
 		return c.OK()
 	}
@@ -285,7 +285,7 @@ func TestLogAlert(t *testing.T) {
 
 func TestLogCritical(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogCritical(logMsg)
 		return c.OK()
 	}
@@ -298,7 +298,7 @@ func TestLogCritical(t *testing.T) {
 
 func TestLogEmergency(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogEmergency(logMsg)
 		return c.OK()
 	}
@@ -310,7 +310,7 @@ func TestLogEmergency(t *testing.T) {
 }
 
 func TestLogPassthrough(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogDebug("this should not get logged")
 		return c.OK()
 	}
@@ -323,7 +323,7 @@ func TestLogPassthrough(t *testing.T) {
 
 func TestStdLoggerDebug(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogDebug(logMsg)
 		return c.OK()
 	}
@@ -336,14 +336,14 @@ func TestStdLoggerDebug(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Debug: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerInfo(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogInfo(logMsg)
 		return c.OK()
 	}
@@ -356,14 +356,14 @@ func TestStdLoggerInfo(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Info: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerNotice(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogNotice(logMsg)
 		return c.OK()
 	}
@@ -376,14 +376,14 @@ func TestStdLoggerNotice(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Notice: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerWarning(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogWarning(logMsg)
 		return c.OK()
 	}
@@ -396,14 +396,14 @@ func TestStdLoggerWarning(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Warning: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerError(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogError(logMsg)
 		return c.OK()
 	}
@@ -416,14 +416,14 @@ func TestStdLoggerError(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Error: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerAlert(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogAlert(logMsg)
 		return c.OK()
 	}
@@ -436,14 +436,14 @@ func TestStdLoggerAlert(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Alert: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerCritical(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogCritical(logMsg)
 		return c.OK()
 	}
@@ -456,14 +456,14 @@ func TestStdLoggerCritical(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Critical: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }
 
 func TestStdLoggerEmergency(t *testing.T) {
 	logMsg := "test log message"
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogEmergency(logMsg)
 		return c.OK()
 	}
@@ -476,7 +476,7 @@ func TestStdLoggerEmergency(t *testing.T) {
 	}
 	app.ServeHTTP(httptest.NewRecorder(), req)
 	got := stdLoggerOut.String()
-	if !strings.Contains(got, logMsg) && !strings.Contains(got, "Emergency: ") {
+	if !strings.Contains(got, logMsg) {
 		t.Errorf("logged wrong message: got '%v' want '%v'", got, logMsg)
 	}
 }

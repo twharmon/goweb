@@ -12,7 +12,7 @@ import (
 )
 
 func TestGET(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -21,7 +21,7 @@ func TestGET(t *testing.T) {
 }
 
 func TestPUT(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -30,7 +30,7 @@ func TestPUT(t *testing.T) {
 }
 
 func TestPATCH(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -39,7 +39,7 @@ func TestPATCH(t *testing.T) {
 }
 
 func TestPOST(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -48,7 +48,7 @@ func TestPOST(t *testing.T) {
 }
 
 func TestDELETE(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -57,7 +57,7 @@ func TestDELETE(t *testing.T) {
 }
 
 func TestOPTIONS(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -66,7 +66,7 @@ func TestOPTIONS(t *testing.T) {
 }
 
 func TestHEAD(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -87,7 +87,7 @@ func TestServeFiles(t *testing.T) {
 }
 
 func TestRouteNotFound(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -96,19 +96,19 @@ func TestRouteNotFound(t *testing.T) {
 }
 
 func TestCustomNotFound(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
 	app.GET("/", handler)
-	app.NotFound(func(c *goweb.Context) *goweb.Response {
+	app.NotFound(func(c *goweb.Context) goweb.Responder {
 		return c.NotFound()
 	})
 	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "")
 }
 
 func TestEmptyPath(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -118,7 +118,7 @@ func TestEmptyPath(t *testing.T) {
 }
 
 func TestNonSlashLeadingPath(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -128,7 +128,7 @@ func TestNonSlashLeadingPath(t *testing.T) {
 }
 
 func TestParams(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name"), c.Param("age"))
 		return c.OK().PlainText(res)
 	}
@@ -138,7 +138,7 @@ func TestParams(t *testing.T) {
 }
 
 func TestParamsNotFound(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name_"), c.Param("age"))
 		return c.OK().PlainText(res)
 	}
@@ -148,7 +148,7 @@ func TestParamsNotFound(t *testing.T) {
 }
 
 func TestNoWWW(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
@@ -161,7 +161,7 @@ func TestNoWWW(t *testing.T) {
 }
 
 func TestNoWWWTLS(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()

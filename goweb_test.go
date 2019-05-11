@@ -13,17 +13,15 @@ import (
 )
 
 type testLogger struct {
-	level int
-	out   *bytes.Buffer
-	log   *log.Logger
-}
-
-func (l *testLogger) ShouldLog(level int) bool {
-	return level >= l.level
+	minLevel int
+	out      *bytes.Buffer
+	log      *log.Logger
 }
 
 func (l *testLogger) Log(level int, msg interface{}) {
-	l.log.Print(msg)
+	if level >= l.minLevel {
+		l.log.Print(msg)
+	}
 }
 
 var stdLoggerOut bytes.Buffer
@@ -35,7 +33,7 @@ func init() {
 
 func newLogger(level int) *testLogger {
 	l := new(testLogger)
-	l.level = level
+	l.minLevel = level
 	l.out = bytes.NewBuffer(nil)
 	l.log = log.New(l.out, "", 0)
 	return l

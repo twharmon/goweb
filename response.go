@@ -8,34 +8,34 @@ const (
 	contentTypeTextPlain       = "text/plain; charset=utf-8"
 )
 
-// Response containts the Context, HTTP status code, a
-// response body, and content type.
-type Response struct {
+// JSONResponse implements Responder interface.
+type JSONResponse struct {
 	context *Context
 	body    interface{}
 }
 
-// JSON returns a Response with JSON body.
-func (r *Response) JSON(value interface{}) *Response {
+// PlainTextResponse implements Responder interface.
+type PlainTextResponse struct {
+	context *Context
+	body    string
+}
+
+// Responder is the Responder interface that responds to
+// HTTP requests.
+type Responder interface {
+	Respond()
+}
+
+// Respond sends a JSON response.
+func (r *JSONResponse) Respond() {
 	r.context.writer.Header().Set(contentTypeHeader, contentTypeApplicationJSON)
-	r.body = value
-	return r
+	r.context.writer.WriteHeader(r.context.status)
+	jsoniter.NewEncoder(r.context.writer).Encode(r.body)
 }
 
-// PlainText returns a Response with plain text body.
-func (r *Response) PlainText(text string) *Response {
+// Respond sends a plain text response.
+func (r *PlainTextResponse) Respond() {
 	r.context.writer.Header().Set(contentTypeHeader, contentTypeTextPlain)
-	r.body = text
-	return r
-}
-
-func (r *Response) send() {
-	if r.body != nil {
-		switch r.context.writer.Header().Get(contentTypeHeader) {
-		case contentTypeApplicationJSON:
-			jsoniter.NewEncoder(r.context.writer).Encode(r.body)
-		case contentTypeTextPlain:
-			r.context.writer.Write([]byte(r.body.(string)))
-		}
-	}
+	r.context.writer.WriteHeader(r.context.status)
+	r.context.writer.Write([]byte(r.body))
 }

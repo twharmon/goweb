@@ -117,7 +117,7 @@ func (e *Engine) HEAD(path string, handler Handler) {
 // ServeFiles will serve files from the given directory
 // with the given path.
 func (e *Engine) ServeFiles(path string, directory string) {
-	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) *Response {
+	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) Responder {
 		http.ServeFile(c.writer, c.request, directory+"/"+c.Param("name"))
 		return nil
 	})
@@ -182,13 +182,13 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 				})
 			}
 			if res := route.handler(c); res != nil {
-				res.send()
+				res.Respond()
 			}
 			return
 		}
 	}
 	if res := e.notFoundHandler(c); res != nil {
-		res.send()
+		res.Respond()
 	}
 }
 
@@ -206,7 +206,7 @@ func (e *Engine) AddCustomLogger(logger Logger) {
 // with log.Println.
 func (e *Engine) AddStdLogger(level int) {
 	e.loggers = append(e.loggers, &stdLogger{
-		level: level,
+		minLevel: level,
 	})
 }
 
@@ -216,7 +216,7 @@ func (e *Engine) AddStdLogger(level int) {
 // SLACK_LOG_WEBHOOK.
 func (e *Engine) AddSlackLogger(level int) {
 	e.loggers = append(e.loggers, &slackLogger{
-		level: level,
+		minLevel: level,
 	})
 }
 
