@@ -8,12 +8,12 @@ import (
 )
 
 func TestPassThroughMiddleware(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK().PlainText(c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := goweb.NewMiddleware()
-	mw.Use(func(c *goweb.Context) *goweb.Response {
+	mw.Use(func(c *goweb.Context) goweb.Responder {
 		c.Set("foo", "bar")
 		return nil
 	})
@@ -22,12 +22,12 @@ func TestPassThroughMiddleware(t *testing.T) {
 }
 
 func TestInterruptingMiddleware(t *testing.T) {
-	handler := func(c *goweb.Context) *goweb.Response {
+	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
 	mw := goweb.NewMiddleware()
-	mw.Use(func(c *goweb.Context) *goweb.Response {
+	mw.Use(func(c *goweb.Context) goweb.Responder {
 		return c.BadRequest()
 	})
 	app.GET("/", mw.Apply(handler))
