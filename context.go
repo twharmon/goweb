@@ -16,78 +16,66 @@ type Context struct {
 	params  params
 	store   Map
 	engine  *Engine
+	status  int
 }
 
-// Status returns a Response with the given status.
-func (c *Context) Status(status int) *Response {
-	c.writer.WriteHeader(status)
-	return &Response{
-		context: c,
-	}
+// Status sets the response status.
+func (c *Context) Status(status int) *Context {
+	c.status = status
+	return c
 }
 
-// OK returns a Response with status 200.
-func (c *Context) OK() *Response {
-	c.writer.WriteHeader(http.StatusOK)
-	return &Response{
-		context: c,
-	}
+// Write implement io.Writer interface for Context.
+func (c *Context) Write(b []byte) (int, error) {
+	return c.writer.Write(b)
 }
 
-// BadRequest returns a Response with status 400.
-func (c *Context) BadRequest() *Response {
-	c.writer.WriteHeader(http.StatusBadRequest)
-	return &Response{
-		context: c,
-	}
+// OK sets the response status to 200.
+func (c *Context) OK() *Context {
+	c.status = http.StatusOK
+	return c
 }
 
-// Unauthorized returns a Response with status 401.
-func (c *Context) Unauthorized() *Response {
-	c.writer.WriteHeader(http.StatusUnauthorized)
-	return &Response{
-		context: c,
-	}
+// BadRequest sets the response status to 400.
+func (c *Context) BadRequest() *Context {
+	c.status = http.StatusBadRequest
+	return c
 }
 
-// Forbidden returns a Response with status 403.
-func (c *Context) Forbidden() *Response {
-	c.writer.WriteHeader(http.StatusForbidden)
-	return &Response{
-		context: c,
-	}
+// Unauthorized sets the response status to 401.
+func (c *Context) Unauthorized() *Context {
+	c.status = http.StatusUnauthorized
+	return c
 }
 
-// NotFound returns a Response with status 404.
-func (c *Context) NotFound() *Response {
-	c.writer.WriteHeader(http.StatusNotFound)
-	return &Response{
-		context: c,
-	}
+// Forbidden sets the response status to 403.
+func (c *Context) Forbidden() *Context {
+	c.status = http.StatusForbidden
+	return c
 }
 
-// Conflict returns a Response with status 409.
-func (c *Context) Conflict() *Response {
-	c.writer.WriteHeader(http.StatusConflict)
-	return &Response{
-		context: c,
-	}
+// NotFound sets the response status to 404.
+func (c *Context) NotFound() *Context {
+	c.status = http.StatusNotFound
+	return c
 }
 
-// UnprocessableEntity returns a Response with status 422.
-func (c *Context) UnprocessableEntity() *Response {
-	c.writer.WriteHeader(http.StatusUnprocessableEntity)
-	return &Response{
-		context: c,
-	}
+// Conflict sets the response status to 409.
+func (c *Context) Conflict() *Context {
+	c.status = http.StatusConflict
+	return c
 }
 
-// InternalServerError returns a Response with status 500.
-func (c *Context) InternalServerError() *Response {
-	c.writer.WriteHeader(http.StatusInternalServerError)
-	return &Response{
-		context: c,
-	}
+// UnprocessableEntity sets the response status to 422.
+func (c *Context) UnprocessableEntity() *Context {
+	c.status = http.StatusUnprocessableEntity
+	return c
+}
+
+// InternalServerError sets the response status to 500.
+func (c *Context) InternalServerError() *Context {
+	c.status = http.StatusInternalServerError
+	return c
 }
 
 // Param gets a path parameter by the given name. An Empty
@@ -149,9 +137,7 @@ func (c *Context) Cookie(name string) (*http.Cookie, error) {
 // ShouldLog(LogLevelDebug) method returns true.
 func (c *Context) LogDebug(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelDebug) {
-			l.Log(LogLevelDebug, message)
-		}
+		l.Log(LogLevelDebug, message)
 	}
 }
 
@@ -159,9 +145,7 @@ func (c *Context) LogDebug(message interface{}) {
 // ShouldLog(LogLevelInfo) method returns true.
 func (c *Context) LogInfo(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelInfo) {
-			l.Log(LogLevelInfo, message)
-		}
+		l.Log(LogLevelInfo, message)
 	}
 }
 
@@ -169,9 +153,7 @@ func (c *Context) LogInfo(message interface{}) {
 // ShouldLog(LogLevelNotice) method returns true.
 func (c *Context) LogNotice(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelNotice) {
-			l.Log(LogLevelNotice, message)
-		}
+		l.Log(LogLevelNotice, message)
 	}
 }
 
@@ -179,9 +161,7 @@ func (c *Context) LogNotice(message interface{}) {
 // ShouldLog(LogLevelWarning) method returns true.
 func (c *Context) LogWarning(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelWarning) {
-			l.Log(LogLevelWarning, message)
-		}
+		l.Log(LogLevelWarning, message)
 	}
 }
 
@@ -189,9 +169,7 @@ func (c *Context) LogWarning(message interface{}) {
 // ShouldLog(LogLevelError) method returns true.
 func (c *Context) LogError(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelError) {
-			l.Log(LogLevelError, message)
-		}
+		l.Log(LogLevelError, message)
 	}
 }
 
@@ -199,9 +177,7 @@ func (c *Context) LogError(message interface{}) {
 // ShouldLog(LogLevelAlert) method returns true.
 func (c *Context) LogAlert(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelAlert) {
-			l.Log(LogLevelAlert, message)
-		}
+		l.Log(LogLevelAlert, message)
 	}
 }
 
@@ -209,9 +185,7 @@ func (c *Context) LogAlert(message interface{}) {
 // ShouldLog(LogLevelCritical) method returns true.
 func (c *Context) LogCritical(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelCritical) {
-			l.Log(LogLevelCritical, message)
-		}
+		l.Log(LogLevelCritical, message)
 	}
 }
 
@@ -219,8 +193,27 @@ func (c *Context) LogCritical(message interface{}) {
 // ShouldLog(LogLevelEmergency) method returns true.
 func (c *Context) LogEmergency(message interface{}) {
 	for _, l := range c.engine.loggers {
-		if l.ShouldLog(LogLevelEmergency) {
-			l.Log(LogLevelEmergency, message)
-		}
+		l.Log(LogLevelEmergency, message)
 	}
+}
+
+// JSON returns a JSONResponse.
+func (c *Context) JSON(value interface{}) *JSONResponse {
+	return &JSONResponse{
+		context: c,
+		body:    value,
+	}
+}
+
+// PlainText returns a PlainTextResponse.
+func (c *Context) PlainText(text string) *PlainTextResponse {
+	return &PlainTextResponse{
+		context: c,
+		body:    text,
+	}
+}
+
+// Respond returns an empty response.
+func (c *Context) Respond() {
+	c.writer.WriteHeader(c.status)
 }

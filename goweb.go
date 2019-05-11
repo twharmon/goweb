@@ -4,12 +4,12 @@ package goweb
 type Map map[string]interface{}
 
 // Handler handles HTTP requests.
-type Handler func(*Context) *Response
+type Handler func(*Context) Responder
 
 // New returns a new Engine.
 func New() *Engine {
 	return &Engine{
-		notFoundHandler: func(c *Context) *Response {
+		notFoundHandler: func(c *Context) Responder {
 			return c.NotFound().PlainText("Page not found")
 		},
 	}

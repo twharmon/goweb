@@ -14,7 +14,7 @@ func (m *Middleware) Use(handlers ...Handler) {
 
 // Apply wraps all of a Middleware's Handlers to a Handler.
 func (m *Middleware) Apply(handler Handler) Handler {
-	return func(c *Context) *Response {
+	return func(c *Context) Responder {
 		for _, mw := range m.chain {
 			if res := mw(c); res != nil {
 				return res
