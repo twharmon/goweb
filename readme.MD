@@ -30,7 +30,7 @@ func main() {
 	app.Run(":8080")
 }
 
-func isAuthUser(c *goweb.Context) *goweb.Response {
+func isAuthUser(c *goweb.Context) goweb.Responder {
 	c.Set("user", &User{
 		ID:   45,
 		Name: c.Param("name"),
@@ -39,7 +39,7 @@ func isAuthUser(c *goweb.Context) *goweb.Response {
 	return nil
 }
 
-func isNotGopher(c *goweb.Context) *goweb.Response {
+func isNotGopher(c *goweb.Context) goweb.Responder {
 	user := c.Get("user").(*User)
 	if strings.ToLower(user.Name) == "gopher" {
 		// return non nil Response to stop middleware.
@@ -48,13 +48,13 @@ func isNotGopher(c *goweb.Context) *goweb.Response {
 	return nil
 }
 
-func hello(c *goweb.Context) *goweb.Response {
+func hello(c *goweb.Context) goweb.Responder {
 	return c.OK().JSON(goweb.Map{
 		"hello": "world",
 	})
 }
 
-func getUser(c *goweb.Context) *goweb.Response {
+func getUser(c *goweb.Context) goweb.Responder {
 	return c.OK().JSON(c.Get("user").(*User))
 }
 ```
