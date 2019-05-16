@@ -121,6 +121,10 @@ func (e *Engine) ServeFiles(path string, directory string) {
 		http.ServeFile(c.writer, c.request, directory+"/"+c.Param("name"))
 		return nil
 	})
+	e.registerRoute(methodGET, path, func(c *Context) Responder {
+		http.ServeFile(c.writer, c.request, directory+"/index.html")
+		return nil
+	})
 }
 
 // NotFound registers a handler to be called if no route is
