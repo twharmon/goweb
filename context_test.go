@@ -114,6 +114,17 @@ func TestJSON(t *testing.T) {
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, resBody)
 }
 
+func TestWrite(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		c.Write([]byte("Hello, world!"))
+		return c.OK()
+	}
+	app := goweb.New()
+	app.GET("/", handler)
+	resBody := "Hello, world!"
+	assert(t, app, "GET", "/", nil, nil, http.StatusOK, resBody)
+}
+
 func TestParseJSON(t *testing.T) {
 	type Msg struct {
 		Hello string `json:"hello"`

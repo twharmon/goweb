@@ -86,6 +86,18 @@ func TestServeFiles(t *testing.T) {
 	os.Remove("./test.txt")
 }
 
+func TestServeFilesIndex(t *testing.T) {
+	content := "<html>hello world</html>"
+	data := []byte(content)
+	if err := ioutil.WriteFile("./index.html", data, 0700); err != nil {
+		t.Error(err)
+	}
+	app := goweb.New()
+	app.ServeFiles("/", ".")
+	assert(t, app, "GET", "/", nil, nil, http.StatusOK, content)
+	os.Remove("./index.html")
+}
+
 func TestRouteNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
