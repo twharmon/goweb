@@ -1,4 +1,4 @@
-# Goweb
+# Goweb ![](https://github.com/twharmon/goweb/workflows/Test/badge.svg)
 Light weight web framework based on net/http.
 
 Includes
