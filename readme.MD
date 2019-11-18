@@ -9,3 +9,6 @@ Includes
 
 ## Usage
 See [examples](https://github.com/twharmon/goweb/tree/master/examples).
+
+## Contribute
+Create a pull request to contribute to Goweb.
