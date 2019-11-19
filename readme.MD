@@ -10,5 +10,8 @@ Includes
 ## Usage
 See [examples](https://github.com/twharmon/goweb/tree/master/examples).
 
+## Documentation
+For full documentation see [godoc](https://godoc.org/github.com/twharmon/goweb).
+
 ## Contribute
 Create a pull request to contribute to Goweb.
