@@ -1,6 +1,10 @@
 package goweb
 
-import jsoniter "github.com/json-iterator/go"
+import (
+	"net/http"
+
+	jsoniter "github.com/json-iterator/go"
+)
 
 const (
 	contentTypeHeader          = "Content-Type"
@@ -12,6 +16,12 @@ const (
 type JSONResponse struct {
 	context *Context
 	body    interface{}
+}
+
+// FileResponse implements Responder interface.
+type FileResponse struct {
+	context *Context
+	path    string
 }
 
 // PlainTextResponse implements Responder interface.
@@ -31,6 +41,11 @@ func (r *JSONResponse) Respond() {
 	r.context.writer.Header().Set(contentTypeHeader, contentTypeApplicationJSON)
 	r.context.writer.WriteHeader(r.context.status)
 	jsoniter.NewEncoder(r.context.writer).Encode(r.body)
+}
+
+// Respond sends a JSON response.
+func (r *FileResponse) Respond() {
+	http.ServeFile(r.context.writer, r.context.request, r.path)
 }
 
 // Respond sends a plain text response.
