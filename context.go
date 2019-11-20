@@ -213,6 +213,14 @@ func (c *Context) PlainText(text string) *PlainTextResponse {
 	}
 }
 
+// File serves a file.
+func (c *Context) File(path string) *FileResponse {
+	return &FileResponse{
+		context: c,
+		path:    path,
+	}
+}
+
 // Respond returns an empty response.
 func (c *Context) Respond() {
 	c.writer.WriteHeader(c.status)
