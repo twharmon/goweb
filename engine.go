@@ -35,7 +35,7 @@ type Engine struct {
 
 	loggers []Logger
 
-	noWWW bool
+	redirectWWW bool
 }
 
 var paramNameRegExp = regexp.MustCompile(`{([a-zA-Z0-9-]+):?(.*?)}`)
@@ -135,7 +135,7 @@ func (e *Engine) NotFound(handler Handler) {
 
 // ServeHTTP implements the http.Handler interface.
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if e.noWWW && strings.HasPrefix(r.Host, "www.") {
+	if e.redirectWWW && strings.HasPrefix(r.Host, "www.") {
 		w.Header().Set("Connection", "close")
 		var scheme string
 		if r.TLS == nil {
@@ -196,9 +196,9 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 	}
 }
 
-// NoWWW redirects all requests to the non-www host.
-func (e *Engine) NoWWW() {
-	e.noWWW = true
+// RedirectWWW redirects all requests to the non-www host.
+func (e *Engine) RedirectWWW() {
+	e.redirectWWW = true
 }
 
 // AddCustomLogger adds a Logger to the Engine.

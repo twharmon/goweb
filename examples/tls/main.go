@@ -13,6 +13,8 @@ func main() {
 		return c.OK().PlainText("hello world")
 	})
 
+	app.RedirectWWW()
+
 	app.RunTLS(&goweb.TLSConfig{
 		// directory to store certificates
 		CertDir: ".certs",

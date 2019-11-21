@@ -164,7 +164,7 @@ func TestNoWWW(t *testing.T) {
 		return c.OK()
 	}
 	app := goweb.New()
-	app.NoWWW()
+	app.RedirectWWW()
 	app.GET("/", handler)
 	transformer := func(r *http.Request) {
 		r.Host = "www.example.com"
@@ -172,12 +172,12 @@ func TestNoWWW(t *testing.T) {
 	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"http://example.com/\">Moved Permanently</a>.\n\n")
 }
 
-func TestNoWWWTLS(t *testing.T) {
+func TestRedirectWWWTLS(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
 	}
 	app := goweb.New()
-	app.NoWWW()
+	app.RedirectWWW()
 	app.GET("/", handler)
 	transformer := func(r *http.Request) {
 		r.Host = "www.example.com"
