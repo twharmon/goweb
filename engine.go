@@ -51,7 +51,7 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 			panic("path '" + path + "' does not start with '/'")
 		}
 		rt.host = parts[0]
-		path = strings.Join(parts[1:], "/")
+		path = "/" + strings.Join(parts[1:], "/")
 	}
 	pathRegExpStr := "^" + path + "$"
 	matches := paramNameRegExp.FindAllStringSubmatch(path, -1)
