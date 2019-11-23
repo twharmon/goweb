@@ -44,10 +44,15 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 	if len(path) == 0 {
 		panic("path can not be empty")
 	}
-	if path[0] != '/' {
-		panic("path '" + path + "' does not start with '/'")
-	}
 	rt := new(route)
+	if path[0] != '/' {
+		parts := strings.Split(path, "/")
+		if len(parts) == 1 {
+			panic("path '" + path + "' does not start with '/'")
+		}
+		rt.host = parts[0]
+		path = strings.Join(parts[1:], "/")
+	}
 	pathRegExpStr := "^" + path + "$"
 	matches := paramNameRegExp.FindAllStringSubmatch(path, -1)
 	for _, match := range matches {
@@ -176,7 +181,8 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 		engine:  e,
 	}
 	for _, route := range routes {
-		if route.regexp.MatchString(r.URL.Path) {
+		hostMatches := route.host == "" || route.host == r.Host
+		if hostMatches && route.regexp.MatchString(r.URL.Path) {
 			c.store = make(Map)
 			matches := route.regexp.FindAllStringSubmatch(r.URL.Path, -1)
 			for i := 1; i < len(matches[0]); i++ {
