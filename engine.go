@@ -237,14 +237,18 @@ func (e *Engine) Run(port string) error {
 
 // RunTLS starts a server on port :443.
 func (e *Engine) RunTLS(config *TLSConfig) error {
+	certDir := "certs"
+	if config.CertDir != "" {
+		certDir = config.CertDir
+	}
 	m := &autocert.Manager{
-		Cache:  autocert.DirCache(config.CertDir),
+		Cache:  autocert.DirCache(certDir),
 		Prompt: autocert.AcceptTOS,
 		HostPolicy: func(_ context.Context, host string) error {
 			return config.HostPolicy(host)
 		},
 	}
-	if config.RedirectHTTP {
+	if !config.AllowHTTP {
 		go http.ListenAndServe(":http", m.HTTPHandler(nil))
 	}
 	s := &http.Server{
