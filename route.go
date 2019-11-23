@@ -7,4 +7,5 @@ type route struct {
 	handler    Handler
 	paramNames []string
 	method     string
+	host       string
 }
