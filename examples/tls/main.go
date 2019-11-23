@@ -17,7 +17,7 @@ func main() {
 
 	app.RunTLS(&goweb.TLSConfig{
 		// directory to store certificates
-		CertDir: ".certs",
+		CertDir: ".certs", // default is "certs"
 
 		// function to determine which hosts are allowed
 		HostPolicy: func(host string) error {
@@ -30,7 +30,7 @@ func main() {
 			return fmt.Errorf("host %s not allowed", host)
 		},
 
-		// redirect http to https
-		RedirectHTTP: true,
+		// default is to redirect http to https
+		AllowHTTP: true,
 	})
 }
