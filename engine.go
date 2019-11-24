@@ -1,13 +1,12 @@
 package goweb
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
 
-	"golang.org/x/crypto/acme/autocert"
+	"github.com/mholt/certmagic"
 )
 
 const (
@@ -235,26 +234,44 @@ func (e *Engine) Run(port string) error {
 	return http.ListenAndServe(port, e)
 }
 
-// RunTLS starts a server on port :443.
-func (e *Engine) RunTLS(config *TLSConfig) error {
-	certDir := "certs"
-	if config.CertDir != "" {
-		certDir = config.CertDir
-	}
-	m := &autocert.Manager{
-		Cache:  autocert.DirCache(certDir),
-		Prompt: autocert.AcceptTOS,
-		HostPolicy: func(_ context.Context, host string) error {
+// // RunTLS starts a server on port :443.
+// func (e *Engine) RunTLS(config *TLSConfig) error {
+// 	// certDir := "certs"
+// 	// if config.CertDir != "" {
+// 	// 	certDir = config.CertDir
+// 	// }
+// 	// m := &autocert.Manager{
+// 	// 	Cache:  autocert.DirCache(certDir),
+// 	// 	Prompt: autocert.AcceptTOS,
+// 	// 	HostPolicy: func(_ context.Context, host string) error {
+// 	// 		return config.HostPolicy(host)
+// 	// 	},
+// 	// }
+// 	// if !config.AllowHTTP {
+// 	// 	go http.ListenAndServe(":http", m.HTTPHandler(nil))
+// 	// }
+// 	// s := &http.Server{
+// 	// 	Addr:      ":https",
+// 	// 	TLSConfig: m.TLSConfig(),
+// 	// 	Handler:   e,
+// 	// }
+// 	// return s.ListenAndServeTLS("", "")
+// 	certmagic.Default.OnDemand = &certmagic.OnDemandConfig{
+// 		DecisionFunc: func(host string) error {
+// 			return config.HostPolicy(host)
+// 		},
+// 	}
+// 	err := certmagic.HTTPS(nil, e)
+// 	return err
+// }
+
+// RunTLS2 starts a server on port :443.
+func (e *Engine) RunTLS2(config *TLSConfig) error {
+	certmagic.Default.OnDemand = &certmagic.OnDemandConfig{
+		DecisionFunc: func(host string) error {
 			return config.HostPolicy(host)
 		},
 	}
-	if !config.AllowHTTP {
-		go http.ListenAndServe(":http", m.HTTPHandler(nil))
-	}
-	s := &http.Server{
-		Addr:      ":https",
-		TLSConfig: m.TLSConfig(),
-		Handler:   e,
-	}
-	return s.ListenAndServeTLS("", "")
+	err := certmagic.HTTPS(nil, e)
+	return err
 }
