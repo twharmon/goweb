@@ -265,8 +265,8 @@ func (e *Engine) Run(port string) error {
 // 	return err
 // }
 
-// RunTLS2 starts a server on port :443.
-func (e *Engine) RunTLS2(config *TLSConfig) error {
+// RunTLS starts a server on port :443.
+func (e *Engine) RunTLS(config *TLSConfig) error {
 	certmagic.Default.OnDemand = &certmagic.OnDemandConfig{
 		DecisionFunc: func(host string) error {
 			return config.HostPolicy(host)
