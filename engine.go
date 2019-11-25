@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 
+	"golang.org/x/crypto/acme"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -241,11 +242,18 @@ func (e *Engine) RunTLS(config *TLSConfig) error {
 	if config.CertDir != "" {
 		certDir = config.CertDir
 	}
+	clientDirectoryURL := "https://acme-v02.api.letsencrypt.org/directory"
+	if config.Staging {
+		clientDirectoryURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+	}
 	m := &autocert.Manager{
 		Cache:  autocert.DirCache(certDir),
 		Prompt: autocert.AcceptTOS,
 		HostPolicy: func(_ context.Context, host string) error {
 			return config.HostPolicy(host)
+		},
+		Client: &acme.Client{
+			DirectoryURL: clientDirectoryURL,
 		},
 	}
 	if !config.AllowHTTP {

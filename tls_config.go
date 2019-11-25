@@ -5,4 +5,5 @@ type TLSConfig struct {
 	CertDir    string
 	HostPolicy func(string) error
 	AllowHTTP  bool
+	Staging    bool
 }
