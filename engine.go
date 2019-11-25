@@ -7,7 +7,6 @@ import (
 	"regexp"
 	"strings"
 
-	"golang.org/x/crypto/acme"
 	"golang.org/x/crypto/acme/autocert"
 )
 
@@ -238,22 +237,14 @@ func (e *Engine) Run(port string) error {
 
 // RunTLS starts a server on port :443.
 func (e *Engine) RunTLS(config *TLSConfig) error {
-	certDir := "certs"
-	if config.CertDir != "" {
-		certDir = config.CertDir
-	}
-	clientDirectoryURL := "https://acme-v02.api.letsencrypt.org/directory"
-	if config.Staging {
-		clientDirectoryURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+	if config.Cache == nil {
+		config.Cache = autocert.DirCache("certs")
 	}
 	m := &autocert.Manager{
-		Cache:  autocert.DirCache(certDir),
+		Cache:  config.Cache,
 		Prompt: autocert.AcceptTOS,
 		HostPolicy: func(_ context.Context, host string) error {
 			return config.HostPolicy(host)
-		},
-		Client: &acme.Client{
-			DirectoryURL: clientDirectoryURL,
 		},
 	}
 	if !config.AllowHTTP {
@@ -265,4 +256,9 @@ func (e *Engine) RunTLS(config *TLSConfig) error {
 		Handler:   e,
 	}
 	return s.ListenAndServeTLS("", "")
+}
+
+// DirCache creates a cache for Let's Encrypt certicicates.
+func DirCache(dir string) autocert.Cache {
+	return autocert.DirCache(dir)
 }

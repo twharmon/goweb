@@ -1,9 +1,10 @@
 package goweb
 
+import "golang.org/x/crypto/acme/autocert"
+
 // TLSConfig contains TLS configuration information.
 type TLSConfig struct {
-	CertDir    string
 	HostPolicy func(string) error
 	AllowHTTP  bool
-	Staging    bool
+	Cache      autocert.Cache
 }
