@@ -16,8 +16,8 @@ func main() {
 	app.RedirectWWW()
 
 	app.RunTLS(&goweb.TLSConfig{
-		// directory to store certificates
-		CertDir: ".certs", // default is "certs"
+		// cache for Let's Encrypt certificates
+		Cache: goweb.DirCache("certs"), // this is the default
 
 		// function to determine which hosts are allowed
 		HostPolicy: func(host string) error {
@@ -30,7 +30,7 @@ func main() {
 			return fmt.Errorf("host %s not allowed", host)
 		},
 
-		// default is to redirect http to https
+		// When set to false (default), http is redirected to https.
 		AllowHTTP: true,
 	})
 }
