@@ -57,7 +57,7 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 	matches := paramNameRegExp.FindAllStringSubmatch(path, -1)
 	for _, match := range matches {
 		if match[2] == "" {
-			match[2] = `[^\\]*`
+			match[2] = `[^\/]*`
 		}
 		rt.paramNames = append(rt.paramNames, match[1])
 		paramInfoRegExp := regexp.MustCompile(fmt.Sprintf("{%s:?(.*?)}", match[1]))
