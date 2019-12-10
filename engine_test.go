@@ -20,19 +20,6 @@ func TestGET(t *testing.T) {
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
 
-func TestPostParamRoute(t *testing.T) {
-	wrongHandler := func(c *goweb.Context) goweb.Responder {
-		return c.BadRequest()
-	}
-	correctHandler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
-	}
-	app := goweb.New()
-	app.GET("/a/{b}", wrongHandler)
-	app.GET("/a/{b}/c", correctHandler)
-	assert(t, app, "GET", "/a/b/c", nil, nil, http.StatusOK, "")
-}
-
 func TestPUT(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()
@@ -85,6 +72,28 @@ func TestHEAD(t *testing.T) {
 	app := goweb.New()
 	app.HEAD("/", handler)
 	assert(t, app, "HEAD", "/", nil, nil, http.StatusOK, "")
+}
+
+func TestPostParamRoute(t *testing.T) {
+	wrongHandler := func(c *goweb.Context) goweb.Responder {
+		return c.BadRequest()
+	}
+	correctHandler := func(c *goweb.Context) goweb.Responder {
+		return c.OK()
+	}
+	app := goweb.New()
+	app.GET("/a/{b}", wrongHandler)
+	app.GET("/a/{b}/c", correctHandler)
+	assert(t, app, "GET", "/a/b/c", nil, nil, http.StatusOK, "")
+}
+
+func TestMultiParamRoute(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		return c.OK()
+	}
+	app := goweb.New()
+	app.GET("/a/{b}/c/{d}", handler)
+	assert(t, app, "GET", "/a/b/c/d", nil, nil, http.StatusOK, "")
 }
 
 func TestServeFiles(t *testing.T) {
