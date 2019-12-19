@@ -38,19 +38,19 @@ type Responder interface {
 
 // Respond sends a JSON response.
 func (r *JSONResponse) Respond() {
-	r.context.writer.Header().Set(contentTypeHeader, contentTypeApplicationJSON)
-	r.context.writer.WriteHeader(r.context.status)
-	jsoniter.NewEncoder(r.context.writer).Encode(r.body)
+	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeApplicationJSON)
+	r.context.ResponseWriter.WriteHeader(r.context.status)
+	jsoniter.NewEncoder(r.context.ResponseWriter).Encode(r.body)
 }
 
 // Respond sends a JSON response.
 func (r *FileResponse) Respond() {
-	http.ServeFile(r.context.writer, r.context.request, r.path)
+	http.ServeFile(r.context.ResponseWriter, r.context.Request, r.path)
 }
 
 // Respond sends a plain text response.
 func (r *PlainTextResponse) Respond() {
-	r.context.writer.Header().Set(contentTypeHeader, contentTypeTextPlain)
-	r.context.writer.WriteHeader(r.context.status)
-	r.context.writer.Write([]byte(r.body))
+	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeTextPlain)
+	r.context.ResponseWriter.WriteHeader(r.context.status)
+	r.context.ResponseWriter.Write([]byte(r.body))
 }

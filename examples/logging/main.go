@@ -5,22 +5,14 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/joho/godotenv"
 	"github.com/twharmon/goweb"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalln(err)
-	}
-
 	app := goweb.New()
 
 	// uses std lib "log"
 	app.AddStdLogger(goweb.LogLevelDebug)
-
-	// uses SLACK_LOG_WEBHOOK environment variable
-	app.AddSlackLogger(goweb.LogLevelError)
 
 	// create your own logger
 	app.AddCustomLogger(&myLogger{goweb.LogLevelNotice})

@@ -123,11 +123,11 @@ func (e *Engine) HEAD(path string, handler Handler) {
 // with the given path.
 func (e *Engine) ServeFiles(path string, directory string) {
 	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) Responder {
-		http.ServeFile(c.writer, c.request, directory+"/"+c.Param("name"))
+		http.ServeFile(c.ResponseWriter, c.Request, directory+"/"+c.Param("name"))
 		return nil
 	})
 	e.registerRoute(methodGET, path, func(c *Context) Responder {
-		http.ServeFile(c.writer, c.request, directory+"/index.html")
+		http.ServeFile(c.ResponseWriter, c.Request, directory+"/index.html")
 		return nil
 	})
 }
@@ -176,9 +176,9 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) {
 	c := &Context{
-		writer:  w,
-		request: r,
-		engine:  e,
+		ResponseWriter: w,
+		Request:        r,
+		engine:         e,
 	}
 	for _, route := range routes {
 		hostMatches := route.host == "" || route.host == r.Host
@@ -216,16 +216,6 @@ func (e *Engine) AddCustomLogger(logger Logger) {
 // with log.Println.
 func (e *Engine) AddStdLogger(level int) {
 	e.loggers = append(e.loggers, &stdLogger{
-		minLevel: level,
-	})
-}
-
-// AddSlackLogger adds a logger that will output log
-// messages to a slack webhook. In order to use this
-// channel, you must set the environment variable
-// SLACK_LOG_WEBHOOK.
-func (e *Engine) AddSlackLogger(level int) {
-	e.loggers = append(e.loggers, &slackLogger{
 		minLevel: level,
 	})
 }
