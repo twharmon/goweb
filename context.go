@@ -15,7 +15,7 @@ type Context struct {
 	Request        *http.Request
 	params         params
 	store          Map
-	engine         *Engine
+	loggers        []Logger
 	status         int
 }
 
@@ -110,7 +110,7 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 // LogDebug logs the given messages for all loggers where
 // ShouldLog(LogLevelDebug) method returns true.
 func (c *Context) LogDebug(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelDebug, message)
 	}
 }
@@ -118,7 +118,7 @@ func (c *Context) LogDebug(message interface{}) {
 // LogInfo logs the given messages for all loggers where
 // ShouldLog(LogLevelInfo) method returns true.
 func (c *Context) LogInfo(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelInfo, message)
 	}
 }
@@ -126,7 +126,7 @@ func (c *Context) LogInfo(message interface{}) {
 // LogNotice logs the given messages for all loggers where
 // ShouldLog(LogLevelNotice) method returns true.
 func (c *Context) LogNotice(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelNotice, message)
 	}
 }
@@ -134,7 +134,7 @@ func (c *Context) LogNotice(message interface{}) {
 // LogWarning logs the given messages for all loggers where
 // ShouldLog(LogLevelWarning) method returns true.
 func (c *Context) LogWarning(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelWarning, message)
 	}
 }
@@ -142,7 +142,7 @@ func (c *Context) LogWarning(message interface{}) {
 // LogError logs the given messages for all loggers where
 // ShouldLog(LogLevelError) method returns true.
 func (c *Context) LogError(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelError, message)
 	}
 }
@@ -150,7 +150,7 @@ func (c *Context) LogError(message interface{}) {
 // LogAlert logs the given messages for all loggers where
 // ShouldLog(LogLevelAlert) method returns true.
 func (c *Context) LogAlert(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelAlert, message)
 	}
 }
@@ -158,7 +158,7 @@ func (c *Context) LogAlert(message interface{}) {
 // LogCritical logs the given messages for all loggers where
 // ShouldLog(LogLevelCritical) method returns true.
 func (c *Context) LogCritical(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelCritical, message)
 	}
 }
@@ -166,7 +166,7 @@ func (c *Context) LogCritical(message interface{}) {
 // LogEmergency logs the given messages for all loggers where
 // ShouldLog(LogLevelEmergency) method returns true.
 func (c *Context) LogEmergency(message interface{}) {
-	for _, l := range c.engine.loggers {
+	for _, l := range c.loggers {
 		l.Log(LogLevelEmergency, message)
 	}
 }
