@@ -130,17 +130,6 @@ func TestFile(t *testing.T) {
 	os.Remove("./test.txt")
 }
 
-func TestWrite(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		c.Write([]byte("Hello, world!"))
-		return c.OK()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	resBody := "Hello, world!"
-	assert(t, app, "GET", "/", nil, nil, http.StatusOK, resBody)
-}
-
 func TestParseJSON(t *testing.T) {
 	type Msg struct {
 		Hello string `json:"hello"`
@@ -156,57 +145,6 @@ func TestParseJSON(t *testing.T) {
 	app := goweb.New()
 	app.POST("/", handler)
 	assert(t, app, "POST", "/", strings.NewReader(body), nil, http.StatusOK, body)
-}
-
-func TestHost(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK().PlainText(c.Host())
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	host := "example.com"
-	transformer := func(r *http.Request) {
-		r.Host = host
-	}
-	assert(t, app, "GET", "/", nil, transformer, http.StatusOK, host)
-}
-
-func TestRequestHeader(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK().PlainText(c.RequestHeader().Get("foo"))
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	transformer := func(r *http.Request) {
-		r.Header.Set("foo", "bar")
-	}
-	assert(t, app, "GET", "/", nil, transformer, http.StatusOK, "bar")
-}
-
-func TestResponseHeader(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		c.ResponseHeader().Set("foo", "bar")
-		return c.OK().PlainText(c.ResponseHeader().Get("foo"))
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "bar")
-}
-
-func TestCookie(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		cookie, err := c.Cookie("foo")
-		if err != nil {
-			return c.BadRequest()
-		}
-		return c.OK().PlainText(cookie.Value)
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	transformer := func(r *http.Request) {
-		r.Header.Set("Cookie", "foo=bar")
-	}
-	assert(t, app, "GET", "/", nil, transformer, http.StatusOK, "bar")
 }
 
 func TestSetCookie(t *testing.T) {

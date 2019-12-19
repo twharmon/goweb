@@ -11,23 +11,18 @@ import (
 // the client. A new Context is constructed for each
 // request, and is dropped when the response is sent.
 type Context struct {
-	writer  http.ResponseWriter
-	request *http.Request
-	params  params
-	store   Map
-	engine  *Engine
-	status  int
+	ResponseWriter http.ResponseWriter
+	Request        *http.Request
+	params         params
+	store          Map
+	engine         *Engine
+	status         int
 }
 
 // Status sets the response status.
 func (c *Context) Status(status int) *Context {
 	c.status = status
 	return c
-}
-
-// Write implement io.Writer interface for Context.
-func (c *Context) Write(b []byte) (int, error) {
-	return c.writer.Write(b)
 }
 
 // OK sets the response status to 200.
@@ -89,7 +84,7 @@ func (c *Context) Param(name string) string {
 // string is returned if a value by the given name
 // doesn't exist.
 func (c *Context) Query(name string) string {
-	return c.request.URL.Query().Get(name)
+	return c.Request.URL.Query().Get(name)
 }
 
 // Set sets a value in the Context data store.
@@ -104,33 +99,12 @@ func (c *Context) Get(key string) interface{} {
 
 // ParseJSON parses the request body into the given target.
 func (c *Context) ParseJSON(target interface{}) error {
-	return jsoniter.NewDecoder(c.request.Body).Decode(target)
-}
-
-// Host returns the requested host.
-func (c *Context) Host() string {
-	return c.request.Host
-}
-
-// RequestHeader returns the request header.
-func (c *Context) RequestHeader() http.Header {
-	return c.request.Header
-}
-
-// ResponseHeader returns the Response header.
-func (c *Context) ResponseHeader() http.Header {
-	return c.writer.Header()
+	return jsoniter.NewDecoder(c.Request.Body).Decode(target)
 }
 
 // SetCookie adds a Set-Cookie header to response.
 func (c *Context) SetCookie(cookie *http.Cookie) {
-	http.SetCookie(c.writer, cookie)
-}
-
-// Cookie returns the cookie by the given name provided in
-// the request or http.ErrNoCookie if not found.
-func (c *Context) Cookie(name string) (*http.Cookie, error) {
-	return c.request.Cookie(name)
+	http.SetCookie(c.ResponseWriter, cookie)
 }
 
 // LogDebug logs the given messages for all loggers where
@@ -223,5 +197,5 @@ func (c *Context) File(path string) *FileResponse {
 
 // Respond returns an empty response.
 func (c *Context) Respond() {
-	c.writer.WriteHeader(c.status)
+	c.ResponseWriter.WriteHeader(c.status)
 }
