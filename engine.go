@@ -178,7 +178,7 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 	c := &Context{
 		ResponseWriter: w,
 		Request:        r,
-		engine:         e,
+		loggers:        e.loggers,
 	}
 	for _, route := range routes {
 		hostMatches := route.host == "" || route.host == r.Host
