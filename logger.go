@@ -1,53 +1,56 @@
 package goweb
 
+// LogLevel as defined in the RFC 5424 specification.
+type LogLevel int
+
 const (
 	// LogLevelDebug as defined in the RFC 5424 specification.
-	LogLevelDebug = iota
+	LogLevelDebug LogLevel = 1
 
 	// LogLevelInfo as defined in the RFC 5424 specification.
-	LogLevelInfo
+	LogLevelInfo LogLevel = 2
 
 	// LogLevelNotice as defined in the RFC 5424 specification.
-	LogLevelNotice
+	LogLevelNotice LogLevel = 3
 
 	// LogLevelWarning as defined in the RFC 5424 specification.
-	LogLevelWarning
+	LogLevelWarning LogLevel = 4
 
 	// LogLevelError as defined in the RFC 5424 specification.
-	LogLevelError
+	LogLevelError LogLevel = 5
 
 	// LogLevelCritical as defined in the RFC 5424 specification.
-	LogLevelCritical
+	LogLevelCritical LogLevel = 6
 
 	// LogLevelAlert as defined in the RFC 5424 specification.
-	LogLevelAlert
+	LogLevelAlert LogLevel = 7
 
 	// LogLevelEmergency as defined in the RFC 5424 specification.
-	LogLevelEmergency
+	LogLevelEmergency LogLevel = 8
 )
 
 // Logger is an interface that implements
 // Log(level int, message interface{}).
 type Logger interface {
-	Log(ctx *Context, level int, message interface{})
+	Log(ctx *Context, level LogLevel, message interface{})
 }
 
-func getTitleAndColor(level int) (string, string) {
-	switch level {
+func (l LogLevel) String() string {
+	switch l {
 	case LogLevelDebug:
-		return "Debug", "#aaaaaa"
+		return "Debug"
 	case LogLevelInfo:
-		return "Info", "#439fe0"
+		return "Info"
 	case LogLevelNotice:
-		return "Notice", "#439fe0"
+		return "Notice"
 	case LogLevelWarning:
-		return "Warning", "warning"
+		return "Warning"
 	case LogLevelError:
-		return "Error", "danger"
+		return "Error"
 	case LogLevelCritical:
-		return "Critical", "danger"
+		return "Critical"
 	case LogLevelAlert:
-		return "Alert", "danger"
+		return "Alert"
 	}
-	return "Emergency", "danger"
+	return "Emergency"
 }

@@ -1,14 +1,25 @@
 package goweb
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 type stdLogger struct {
-	minLevel int
+	minLevel LogLevel
 }
 
-func (l *stdLogger) Log(c *Context, level int, message interface{}) {
+func (l *stdLogger) Log(c *Context, level LogLevel, message interface{}) {
 	if level >= l.minLevel {
-		title, _ := getTitleAndColor(level)
-		log.Printf("%s: %s - %s\n", title, c.Request.URL.Path, message)
+		query := c.Request.URL.Query().Encode()
+		if query != "" {
+			query = "?" + query
+		}
+		scheme := c.Request.URL.Scheme
+		if scheme != "" {
+			scheme = scheme + "//"
+		}
+		uri := fmt.Sprintf("%s%s%s%s", c.Request.URL.Scheme, c.Request.Host, c.Request.URL.Path, query)
+		log.Printf("%s: %s - %s\n", level.String(), uri, message)
 	}
 }
