@@ -1,10 +1,5 @@
 package goweb
 
-import (
-	"fmt"
-	"runtime"
-)
-
 const (
 	// LogLevelDebug as defined in the RFC 5424 specification.
 	LogLevelDebug = iota
@@ -34,7 +29,7 @@ const (
 // Logger is an interface that implements
 // Log(level int, message interface{}).
 type Logger interface {
-	Log(level int, message interface{})
+	Log(ctx *Context, level int, message interface{})
 }
 
 func getTitleAndColor(level int) (string, string) {
@@ -55,9 +50,4 @@ func getTitleAndColor(level int) (string, string) {
 		return "Alert", "danger"
 	}
 	return "Emergency", "danger"
-}
-
-func caller() string {
-	_, f, l, _ := runtime.Caller(3)
-	return fmt.Sprintf("%s#%d", f, l)
 }

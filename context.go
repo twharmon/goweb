@@ -111,7 +111,7 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 // ShouldLog(LogLevelDebug) method returns true.
 func (c *Context) LogDebug(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelDebug, message)
+		l.Log(c, LogLevelDebug, message)
 	}
 }
 
@@ -119,7 +119,7 @@ func (c *Context) LogDebug(message interface{}) {
 // ShouldLog(LogLevelInfo) method returns true.
 func (c *Context) LogInfo(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelInfo, message)
+		l.Log(c, LogLevelInfo, message)
 	}
 }
 
@@ -127,7 +127,7 @@ func (c *Context) LogInfo(message interface{}) {
 // ShouldLog(LogLevelNotice) method returns true.
 func (c *Context) LogNotice(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelNotice, message)
+		l.Log(c, LogLevelNotice, message)
 	}
 }
 
@@ -135,7 +135,7 @@ func (c *Context) LogNotice(message interface{}) {
 // ShouldLog(LogLevelWarning) method returns true.
 func (c *Context) LogWarning(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelWarning, message)
+		l.Log(c, LogLevelWarning, message)
 	}
 }
 
@@ -143,7 +143,7 @@ func (c *Context) LogWarning(message interface{}) {
 // ShouldLog(LogLevelError) method returns true.
 func (c *Context) LogError(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelError, message)
+		l.Log(c, LogLevelError, message)
 	}
 }
 
@@ -151,7 +151,7 @@ func (c *Context) LogError(message interface{}) {
 // ShouldLog(LogLevelAlert) method returns true.
 func (c *Context) LogAlert(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelAlert, message)
+		l.Log(c, LogLevelAlert, message)
 	}
 }
 
@@ -159,7 +159,7 @@ func (c *Context) LogAlert(message interface{}) {
 // ShouldLog(LogLevelCritical) method returns true.
 func (c *Context) LogCritical(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelCritical, message)
+		l.Log(c, LogLevelCritical, message)
 	}
 }
 
@@ -167,7 +167,7 @@ func (c *Context) LogCritical(message interface{}) {
 // ShouldLog(LogLevelEmergency) method returns true.
 func (c *Context) LogEmergency(message interface{}) {
 	for _, l := range c.loggers {
-		l.Log(LogLevelEmergency, message)
+		l.Log(c, LogLevelEmergency, message)
 	}
 }
 
