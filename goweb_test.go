@@ -18,7 +18,7 @@ type testLogger struct {
 	log      *log.Logger
 }
 
-func (l *testLogger) Log(level int, msg interface{}) {
+func (l *testLogger) Log(_ *goweb.Context, level int, msg interface{}) {
 	if level >= l.minLevel {
 		l.log.Print(msg)
 	}
