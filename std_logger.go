@@ -19,7 +19,7 @@ func (l *stdLogger) Log(c *Context, level LogLevel, message interface{}) {
 		if c.Request.TLS != nil {
 			scheme = "https://"
 		}
-		uri := fmt.Sprintf("%s%s%s%s", scheme, c.Request.Host, c.Request.URL.Path, query)
+		uri := fmt.Sprintf("%s %s%s%s%s", c.Request.Method, scheme, c.Request.Host, c.Request.URL.Path, query)
 		log.Printf("%s: %s - %s\n", level.String(), uri, message)
 	}
 }
