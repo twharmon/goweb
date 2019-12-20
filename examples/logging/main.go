@@ -46,7 +46,7 @@ type myLogger struct {
 	minLevel int
 }
 
-func (l *myLogger) Log(logLevel int, message interface{}) {
+func (l *myLogger) Log(_ *goweb.Context, logLevel int, message interface{}) {
 	if logLevel >= l.minLevel {
 		log.Printf("Notice - %v", message)
 	}
