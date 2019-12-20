@@ -15,11 +15,11 @@ func (l *stdLogger) Log(c *Context, level LogLevel, message interface{}) {
 		if query != "" {
 			query = "?" + query
 		}
-		scheme := c.Request.URL.Scheme
-		if scheme != "" {
-			scheme = scheme + "//"
+		scheme := "http://"
+		if c.Request.TLS != nil {
+			scheme = "https://"
 		}
-		uri := fmt.Sprintf("%s%s%s%s", c.Request.URL.Scheme, c.Request.Host, c.Request.URL.Path, query)
+		uri := fmt.Sprintf("%s%s%s%s", scheme, c.Request.Host, c.Request.URL.Path, query)
 		log.Printf("%s: %s - %s\n", level.String(), uri, message)
 	}
 }
