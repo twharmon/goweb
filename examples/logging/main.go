@@ -43,10 +43,10 @@ func divide(c *goweb.Context) goweb.Responder {
 }
 
 type myLogger struct {
-	minLevel int
+	minLevel goweb.LogLevel
 }
 
-func (l *myLogger) Log(_ *goweb.Context, logLevel int, message interface{}) {
+func (l *myLogger) Log(_ *goweb.Context, logLevel goweb.LogLevel, message interface{}) {
 	if logLevel >= l.minLevel {
 		log.Printf("Notice - %v", message)
 	}

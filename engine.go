@@ -214,7 +214,7 @@ func (e *Engine) AddCustomLogger(logger Logger) {
 
 // AddStdLogger adds a logger that will output log messages
 // with log.Println.
-func (e *Engine) AddStdLogger(level int) {
+func (e *Engine) AddStdLogger(level LogLevel) {
 	e.loggers = append(e.loggers, &stdLogger{
 		minLevel: level,
 	})
