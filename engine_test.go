@@ -120,6 +120,35 @@ func TestServeFilesIndex(t *testing.T) {
 	os.Remove("./index.html")
 }
 
+func TestGzipAndServeFiles(t *testing.T) {
+	content := "test file contents"
+	data := []byte(content)
+	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
+		t.Error(err)
+	}
+	app := goweb.New()
+	app.GzipAndServeFiles("/", ".", 10)
+	assertOK(t, app, "GET", "/test.txt", nil, nil, http.StatusOK)
+	os.Remove("./test.txt")
+	os.Remove("./test.txt.gz")
+}
+
+func TestGzipAndServeFilesIndex(t *testing.T) {
+	content := "<html>hello world</html>"
+	data := []byte(content)
+	if err := ioutil.WriteFile("./index.html", data, 0700); err != nil {
+		t.Error(err)
+	}
+	app := goweb.New()
+	app.GzipAndServeFiles("/", ".", 10)
+	transformer := func(r *http.Request) {
+		r.Header.Set("Accept-Encoding", "gzip")
+	}
+	assertOK(t, app, "GET", "/", nil, transformer, http.StatusOK)
+	os.Remove("./index.html")
+	os.Remove("./index.html.gz")
+}
+
 func TestRouteNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.OK()

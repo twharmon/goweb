@@ -123,12 +123,36 @@ func (e *Engine) HEAD(path string, handler Handler) {
 // with the given path.
 func (e *Engine) ServeFiles(path string, directory string) {
 	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) Responder {
-		http.ServeFile(c.ResponseWriter, c.Request, directory+"/"+c.Param("name"))
-		return nil
+		return &FileResponse{
+			path:    directory + "/" + c.Param("name"),
+			context: c,
+		}
 	})
 	e.registerRoute(methodGET, path, func(c *Context) Responder {
-		http.ServeFile(c.ResponseWriter, c.Request, directory+"/index.html")
-		return nil
+		return &FileResponse{
+			path:    directory + "/index.html",
+			context: c,
+		}
+	})
+}
+
+// GzipAndServeFiles will serve files from the given directory
+// with the given path. If the file size is greater than the given
+// size, a gzipped version of the file will be created and served.
+func (e *Engine) GzipAndServeFiles(path string, directory string, size int64) {
+	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) Responder {
+		return &FileResponse{
+			path:    directory + "/" + c.Param("name"),
+			context: c,
+			gzip:    size,
+		}
+	})
+	e.registerRoute(methodGET, path, func(c *Context) Responder {
+		return &FileResponse{
+			path:    directory + "/index.html",
+			context: c,
+			gzip:    size,
+		}
 	})
 }
 

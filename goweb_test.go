@@ -57,6 +57,21 @@ func assert(t *testing.T, app *goweb.Engine, method string, path string, reqBody
 	}
 }
 
+func assertOK(t *testing.T, app *goweb.Engine, method string, path string, reqBody io.Reader, reqTransformer func(*http.Request), status int) {
+	req, err := http.NewRequest(method, path, reqBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if reqTransformer != nil {
+		reqTransformer(req)
+	}
+	rr := httptest.NewRecorder()
+	app.ServeHTTP(rr, req)
+	if rr.Code != status {
+		t.Errorf("handler returned wrong status code: got %v want %v", rr.Code, status)
+	}
+}
+
 func assertLog(t *testing.T, app *goweb.Engine, method string, path string, logger *testLogger, logMsg string) {
 	req, err := http.NewRequest(method, path, nil)
 	if err != nil {
