@@ -9,6 +9,7 @@ Includes
 - middleware
 - autoTLS
 - logging
+- websockets
 
 ## Usage
 See [examples](https://github.com/twharmon/goweb/tree/master/examples).
