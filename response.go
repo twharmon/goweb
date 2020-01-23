@@ -54,7 +54,7 @@ func (r *JSONResponse) Respond() {
 	jsoniter.NewEncoder(r.context.ResponseWriter).Encode(r.body)
 }
 
-// Respond sends a JSON response.
+// Respond sends a file response.
 func (r *FileResponse) Respond() {
 	if r.gzip == 0 {
 		http.ServeFile(r.context.ResponseWriter, r.context.Request, r.path)
