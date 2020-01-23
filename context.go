@@ -1,9 +1,8 @@
 package goweb
 
 import (
+	"encoding/json"
 	"net/http"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 // Context provides helper methods to read the request, get
@@ -105,7 +104,7 @@ func (c *Context) Get(key string) interface{} {
 
 // ParseJSON parses the request body into the given target.
 func (c *Context) ParseJSON(target interface{}) error {
-	return jsoniter.NewDecoder(c.Request.Body).Decode(target)
+	return json.NewDecoder(c.Request.Body).Decode(target)
 }
 
 // SetCookie adds a Set-Cookie header to response.
