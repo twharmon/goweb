@@ -218,6 +218,7 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 		ResponseWriter: w,
 		Request:        r,
 		loggers:        e.loggers,
+		status:         http.StatusOK,
 	}
 	for _, route := range routes {
 		hostMatches := route.host == "" || route.host == r.Host

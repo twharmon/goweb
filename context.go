@@ -31,6 +31,12 @@ func (c *Context) OK() *Context {
 	return c
 }
 
+// Created sets the response status to 201.
+func (c *Context) Created() *Context {
+	c.status = http.StatusCreated
+	return c
+}
+
 // BadRequest sets the response status to 400.
 func (c *Context) BadRequest() *Context {
 	c.status = http.StatusBadRequest

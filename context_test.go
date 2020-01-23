@@ -29,6 +29,15 @@ func TestOK(t *testing.T) {
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
 
+func TestCreated(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		return c.Created()
+	}
+	app := goweb.New()
+	app.GET("/", handler)
+	assert(t, app, "GET", "/", nil, nil, http.StatusCreated, "")
+}
+
 func TestBadRequest(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.BadRequest()
