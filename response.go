@@ -2,14 +2,13 @@ package goweb
 
 import (
 	"compress/gzip"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strings"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 const (
@@ -51,7 +50,7 @@ type Responder interface {
 func (r *JSONResponse) Respond() {
 	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeApplicationJSON)
 	r.context.ResponseWriter.WriteHeader(r.context.status)
-	jsoniter.NewEncoder(r.context.ResponseWriter).Encode(r.body)
+	json.NewEncoder(r.context.ResponseWriter).Encode(r.body)
 }
 
 // Respond sends a file response.
