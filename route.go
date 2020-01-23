@@ -1,11 +1,16 @@
 package goweb
 
-import "regexp"
+import (
+	"regexp"
+
+	"golang.org/x/net/websocket"
+)
 
 type route struct {
-	regexp     *regexp.Regexp
-	handler    Handler
-	paramNames []string
-	method     string
-	host       string
+	regexp           *regexp.Regexp
+	handler          Handler
+	webSocketHandler websocket.Handler
+	paramNames       []string
+	method           string
+	host             string
 }

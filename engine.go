@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"golang.org/x/crypto/acme/autocert"
+	"golang.org/x/net/websocket"
 )
 
 const (
@@ -41,9 +42,28 @@ type Engine struct {
 var paramNameRegExp = regexp.MustCompile(`{([a-zA-Z0-9-]+):?(.*?)}`)
 
 func (e *Engine) registerRoute(method string, path string, handler Handler) {
-	if len(path) == 0 {
-		panic("path can not be empty")
+	rt := getRouteFromPath(path)
+	rt.handler = handler
+	rt.method = method
+	switch method {
+	case methodGET:
+		e.getRoutes = append(e.getRoutes, rt)
+	case methodPUT:
+		e.putRoutes = append(e.putRoutes, rt)
+	case methodPATCH:
+		e.patchRoutes = append(e.patchRoutes, rt)
+	case methodPOST:
+		e.postRoutes = append(e.postRoutes, rt)
+	case methodDELETE:
+		e.deleteRoutes = append(e.deleteRoutes, rt)
+	case methodOPTIONS:
+		e.optionsRoutes = append(e.optionsRoutes, rt)
+	case methodHEAD:
+		e.headRoutes = append(e.headRoutes, rt)
 	}
+}
+
+func getRouteFromPath(path string) *route {
 	rt := new(route)
 	if path[0] != '/' {
 		parts := strings.Split(path, "/")
@@ -64,24 +84,14 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 		pathRegExpStr = paramInfoRegExp.ReplaceAllString(pathRegExpStr, "("+match[2]+")")
 	}
 	rt.regexp = regexp.MustCompile(pathRegExpStr)
-	rt.handler = handler
-	rt.method = method
-	switch method {
-	case methodGET:
-		e.getRoutes = append(e.getRoutes, rt)
-	case methodPUT:
-		e.putRoutes = append(e.putRoutes, rt)
-	case methodPATCH:
-		e.patchRoutes = append(e.patchRoutes, rt)
-	case methodPOST:
-		e.postRoutes = append(e.postRoutes, rt)
-	case methodDELETE:
-		e.deleteRoutes = append(e.deleteRoutes, rt)
-	case methodOPTIONS:
-		e.optionsRoutes = append(e.optionsRoutes, rt)
-	case methodHEAD:
-		e.headRoutes = append(e.headRoutes, rt)
-	}
+	return rt
+}
+
+func (e *Engine) registerWebSocketRoute(path string, handler websocket.Handler) {
+	rt := getRouteFromPath(path)
+	rt.webSocketHandler = handler
+	rt.method = methodGET
+	e.getRoutes = append(e.getRoutes, rt)
 }
 
 // GET registers a route for method GET.
@@ -117,6 +127,11 @@ func (e *Engine) OPTIONS(path string, handler Handler) {
 // HEAD registers a route for method HEAD.
 func (e *Engine) HEAD(path string, handler Handler) {
 	e.registerRoute(methodHEAD, path, handler)
+}
+
+// WebSocket registers a route for websockets.
+func (e *Engine) WebSocket(path string, handler websocket.Handler) {
+	e.registerWebSocketRoute(path, handler)
 }
 
 // ServeFiles will serve files from the given directory
@@ -216,8 +231,12 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 					value: matches[0][i],
 				})
 			}
-			if res := route.handler(c); res != nil {
-				res.Respond()
+			if route.webSocketHandler != nil {
+				route.webSocketHandler.ServeHTTP(w, r)
+			} else {
+				if res := route.handler(c); res != nil {
+					res.Respond()
+				}
 			}
 			return
 		}
