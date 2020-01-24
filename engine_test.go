@@ -193,7 +193,7 @@ func TestNonSlashLeadingPath(t *testing.T) {
 func TestParams(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name"), c.Param("age"))
-		return c.OK().PlainText(res)
+		return c.OK().Text(res)
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)
@@ -203,7 +203,7 @@ func TestParams(t *testing.T) {
 func TestParamsNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name_"), c.Param("age"))
-		return c.OK().PlainText(res)
+		return c.OK().Text(res)
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)
