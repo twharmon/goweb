@@ -38,7 +38,7 @@ func isNotGopher(c *goweb.Context) goweb.Responder {
 	user := c.Get("user").(*User)
 	if strings.ToLower(user.Name) == "gopher" {
 		// return non nil Responder to terminate middleware chain
-		return c.Forbidden().PlainText("no gophers allowed")
+		return c.Forbidden().Text("no gophers allowed")
 	}
 
 	// return nil to continue the middleware chain

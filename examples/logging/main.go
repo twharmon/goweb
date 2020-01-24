@@ -26,20 +26,20 @@ func divide(c *goweb.Context) goweb.Responder {
 	a, err := strconv.ParseFloat(c.Param("a"), 64)
 	if err != nil {
 		c.LogNotice(fmt.Sprintf("attempted to divide %s", c.Param("a")))
-		return c.BadRequest().PlainText("only numbers can be divided")
+		return c.BadRequest().Text("only numbers can be divided")
 	}
 	b, err := strconv.ParseFloat(c.Param("b"), 64)
 	if err != nil {
 		c.LogNotice(fmt.Sprintf("attempted to divide %s", c.Param("b")))
-		return c.BadRequest().PlainText("only numbers can be divided")
+		return c.BadRequest().Text("only numbers can be divided")
 	}
 
 	if b == 0 {
 		c.LogEmergency("division by zero")
-		return c.BadRequest().PlainText("can not divide by zero")
+		return c.BadRequest().Text("can not divide by zero")
 	}
 
-	return c.OK().PlainText(fmt.Sprintf("%f", a/b))
+	return c.OK().Text(fmt.Sprintf("%f", a/b))
 }
 
 type myLogger struct {

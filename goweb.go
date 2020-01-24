@@ -10,7 +10,7 @@ type Handler func(*Context) Responder
 func New() *Engine {
 	return &Engine{
 		notFoundHandler: func(c *Context) Responder {
-			return c.NotFound().PlainText("Page not found")
+			return c.NotFound().Text("Page not found")
 		},
 	}
 }

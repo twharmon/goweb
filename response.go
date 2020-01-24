@@ -34,8 +34,8 @@ type FileResponse struct {
 	gzip    int64
 }
 
-// PlainTextResponse implements Responder interface.
-type PlainTextResponse struct {
+// TextResponse implements Responder interface.
+type TextResponse struct {
 	context *Context
 	body    string
 }
@@ -116,7 +116,7 @@ func (r *FileResponse) gzipIfNeeded(path string, gzipPath string, fi os.FileInfo
 }
 
 // Respond sends a plain text response.
-func (r *PlainTextResponse) Respond() {
+func (r *TextResponse) Respond() {
 	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeTextPlain)
 	r.context.ResponseWriter.WriteHeader(r.context.status)
 	r.context.ResponseWriter.Write([]byte(r.body))

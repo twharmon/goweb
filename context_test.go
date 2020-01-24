@@ -103,7 +103,7 @@ func TestInternalServerError(t *testing.T) {
 
 func TestQuery(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK().PlainText(c.Query("foo"))
+		return c.OK().Text(c.Query("foo"))
 	}
 	app := goweb.New()
 	app.GET("/", handler)

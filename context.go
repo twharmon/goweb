@@ -184,9 +184,9 @@ func (c *Context) JSON(value interface{}) *JSONResponse {
 	}
 }
 
-// PlainText returns a PlainTextResponse.
-func (c *Context) PlainText(text string) *PlainTextResponse {
-	return &PlainTextResponse{
+// Text returns a TextResponse.
+func (c *Context) Text(text string) *TextResponse {
+	return &TextResponse{
 		context: c,
 		body:    text,
 	}
