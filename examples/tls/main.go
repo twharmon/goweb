@@ -10,7 +10,7 @@ func main() {
 	app := goweb.New()
 
 	app.GET("/", func(c *goweb.Context) goweb.Responder {
-		return c.OK().Text("hello world")
+		return c.Text("hello world")
 	})
 
 	app.RedirectWWW()

@@ -3,26 +3,59 @@ package goweb_test
 import (
 	"crypto/tls"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
+
+	"golang.org/x/net/websocket"
 
 	"github.com/twharmon/goweb"
 )
 
 func TestGET(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
 
+func TestWS(t *testing.T) {
+	app := goweb.New()
+	app.WebSocket("/", func(c *websocket.Conn) {
+		io.Copy(c, c)
+	})
+	go func() {
+		conn, err := websocket.Dial("ws://localhost:8080/", "", "http://localhost/")
+		if err != nil {
+			t.Error(err)
+		}
+		want := []byte("hi")
+		conn.Write(want)
+		var got = make([]byte, 512)
+		_, err = conn.Read(got)
+		if err != nil {
+			t.Error(err)
+		}
+		if !strings.HasPrefix(string(got), string(want)) {
+			t.Errorf("expected %s to equal %s", string(got), string(want))
+		}
+		if err := app.Shutdown(); err != nil {
+			t.Error(err)
+		}
+	}()
+	if err := app.Run(":8080"); err != http.ErrServerClosed {
+		t.Errorf("expected %v to equal %v", err, http.ErrServerClosed)
+	}
+}
+
 func TestPUT(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.PUT("/", handler)
@@ -31,7 +64,7 @@ func TestPUT(t *testing.T) {
 
 func TestPATCH(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.PATCH("/", handler)
@@ -40,7 +73,7 @@ func TestPATCH(t *testing.T) {
 
 func TestPOST(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.POST("/", handler)
@@ -49,7 +82,7 @@ func TestPOST(t *testing.T) {
 
 func TestDELETE(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.DELETE("/", handler)
@@ -58,7 +91,7 @@ func TestDELETE(t *testing.T) {
 
 func TestOPTIONS(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.OPTIONS("/", handler)
@@ -67,7 +100,7 @@ func TestOPTIONS(t *testing.T) {
 
 func TestHEAD(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.HEAD("/", handler)
@@ -76,10 +109,10 @@ func TestHEAD(t *testing.T) {
 
 func TestPostParamRoute(t *testing.T) {
 	wrongHandler := func(c *goweb.Context) goweb.Responder {
-		return c.BadRequest()
+		return c.BadRequest().Empty()
 	}
 	correctHandler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.GET("/a/{b}", wrongHandler)
@@ -89,7 +122,7 @@ func TestPostParamRoute(t *testing.T) {
 
 func TestMultiParamRoute(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.GET("/a/{b}/c/{d}", handler)
@@ -151,7 +184,7 @@ func TestGzipAndServeFilesIndex(t *testing.T) {
 
 func TestRouteNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.GET("/", handler)
@@ -160,19 +193,19 @@ func TestRouteNotFound(t *testing.T) {
 
 func TestCustomNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.GET("/", handler)
 	app.NotFound(func(c *goweb.Context) goweb.Responder {
-		return c.NotFound()
+		return c.NotFound().Empty()
 	})
 	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "")
 }
 
 func TestEmptyPath(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	assertPanic(t, func() {
@@ -182,7 +215,7 @@ func TestEmptyPath(t *testing.T) {
 
 func TestNonSlashLeadingPath(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	assertPanic(t, func() {
@@ -193,7 +226,7 @@ func TestNonSlashLeadingPath(t *testing.T) {
 func TestParams(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name"), c.Param("age"))
-		return c.OK().Text(res)
+		return c.Text(res)
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)
@@ -203,7 +236,7 @@ func TestParams(t *testing.T) {
 func TestParamsNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name_"), c.Param("age"))
-		return c.OK().Text(res)
+		return c.Text(res)
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)
@@ -212,7 +245,7 @@ func TestParamsNotFound(t *testing.T) {
 
 func TestNoWWW(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.RedirectWWW()
@@ -225,7 +258,7 @@ func TestNoWWW(t *testing.T) {
 
 func TestRedirectWWWTLS(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.OK()
+		return c.Empty()
 	}
 	app := goweb.New()
 	app.RedirectWWW()

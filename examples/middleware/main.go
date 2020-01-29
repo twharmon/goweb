@@ -46,11 +46,11 @@ func isNotGopher(c *goweb.Context) goweb.Responder {
 }
 
 func hello(c *goweb.Context) goweb.Responder {
-	return c.OK().JSON(goweb.Map{
+	return c.JSON(goweb.Map{
 		"hello": "world",
 	})
 }
 
 func getUser(c *goweb.Context) goweb.Responder {
-	return c.OK().JSON(c.Get("user").(*User))
+	return c.JSON(c.Get("user").(*User))
 }

@@ -39,7 +39,7 @@ func divide(c *goweb.Context) goweb.Responder {
 		return c.BadRequest().Text("can not divide by zero")
 	}
 
-	return c.OK().Text(fmt.Sprintf("%f", a/b))
+	return c.Text(fmt.Sprintf("%f", a/b))
 }
 
 type myLogger struct {
