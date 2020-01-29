@@ -26,13 +26,13 @@ import (
 )
 
 func main() {
-	app := goweb.New()
-	app.GET("/hello/{name}", func(c *goweb.Context) goweb.Responder {
+    app := goweb.New()
+    app.GET("/hello/{name}", func(c *goweb.Context) goweb.Responder {
         return c.JSON(goweb.Map{
             "hello": c.Param("name"),
         })
     })
-	app.Run(":8080")
+    app.Run(":8080")
 }
 ```
 
