@@ -61,7 +61,7 @@ BenchmarkGowebJSON        	     96569 ns/op	   51026 B/op	      16 allocs/op
 BenchmarkGinJSON          	     96568 ns/op	   50485 B/op	      12 allocs/op
 BenchmarkGorillaJSON      	     98893 ns/op	   51428 B/op	      19 allocs/op
 BenchmarkEchoJSON         	     98160 ns/op	   50482 B/op	      11 allocs/op
-BenchmarkMartiniJSON         	216111 ns/op	  144936 B/op	      41 allocs/op
+BenchmarkMartiniJSON                216111 ns/op	  144936 B/op	      41 allocs/op
 
 BenchmarkGowebPathParams  	      4061 ns/op	    2697 B/op	      36 allocs/op
 BenchmarkGinPathParams    	      2974 ns/op	    2024 B/op	      29 allocs/op
