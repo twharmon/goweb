@@ -7,13 +7,22 @@ import (
 func main() {
 	app := goweb.New()
 
-	app.GET("/", hello)
+	app.GET("/hello", func(c *goweb.Context) goweb.Responder {
+		return c.JSON(goweb.Map{
+			"hello": "world",
+		})
+	})
+	app.GET("/hello/{name}", func(c *goweb.Context) goweb.Responder {
+		return c.JSON(goweb.Map{
+			"hello": c.Param("name"),
+		})
+	})
+	app.GET("/hello/{name}/{age:[0-9]+}", func(c *goweb.Context) goweb.Responder {
+		return c.JSON(goweb.Map{
+			"hello": c.Param("name"),
+			"age":   c.Param("age"),
+		})
+	})
 
 	app.Run(":8080")
-}
-
-func hello(c *goweb.Context) goweb.Responder {
-	return c.JSON(goweb.Map{
-		"hello": "world",
-	})
 }
