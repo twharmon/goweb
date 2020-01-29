@@ -50,26 +50,24 @@ For example, `/posts/{id}` and `/post/new` can not both be registered.
 
 Goweb avoids these limitations by using the standard library's `net/http` instead of `fasthttp`/`fasthttprouter`.
 
-Plaintext response "hello world" (requests/sec):
 ```
-Goweb       79649.12
-Gin         81365.57
-Gorilla     77746.85
-```
+BenchmarkGowebPlaintext   	      1495 ns/op	    1528 B/op	      20 allocs/op
+BenchmarkGinPlaintext     	       994 ns/op	    1096 B/op	      13 allocs/op
+BenchmarkGorillaPlaintext 	      2209 ns/op	    2056 B/op	      23 allocs/op
+BenchmarkEchoPlaintext    	      1032 ns/op	    1080 B/op	      14 allocs/op
+BenchmarkMartiniPlaintext 	     14513 ns/op	    1889 B/op	      41 allocs/op
 
-JSON response 100 posts (requests/sec):
-```
-Goweb       15089.02
-Gin         13191.71
-Gorilla     12836.61
-```
+BenchmarkGowebJSON        	     96569 ns/op	   51026 B/op	      16 allocs/op
+BenchmarkGinJSON          	     96568 ns/op	   50485 B/op	      12 allocs/op
+BenchmarkGorillaJSON      	     98893 ns/op	   51428 B/op	      19 allocs/op
+BenchmarkEchoJSON         	     98160 ns/op	   50482 B/op	      11 allocs/op
+BenchmarkMartiniJSON         	216111 ns/op	  144936 B/op	      41 allocs/op
 
-
-JSON response with path parameter (requests/sec):
-```
-Goweb       71947.38
-Gin         72422.31
-Gorilla     57994.28
+BenchmarkGowebPathParams  	      4061 ns/op	    2697 B/op	      36 allocs/op
+BenchmarkGinPathParams    	      2974 ns/op	    2024 B/op	      29 allocs/op
+BenchmarkGorillaPathParams	      4600 ns/op	    3241 B/op	      37 allocs/op
+BenchmarkEchoPathParams   	      2833 ns/op	    1976 B/op	      28 allocs/op
+BenchmarkMartiniPathParams	     16084 ns/op	    2734 B/op	      47 allocs/op
 ```
 
 ## Contribute
