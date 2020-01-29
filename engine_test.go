@@ -3,14 +3,10 @@ package goweb_test
 import (
 	"crypto/tls"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
-
-	"golang.org/x/net/websocket"
 
 	"github.com/twharmon/goweb"
 )
@@ -22,35 +18,6 @@ func TestGET(t *testing.T) {
 	app := goweb.New()
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
-}
-
-func TestWS(t *testing.T) {
-	app := goweb.New()
-	app.WebSocket("/", func(c *websocket.Conn) {
-		io.Copy(c, c)
-	})
-	go func() {
-		conn, err := websocket.Dial("ws://localhost:8080/", "", "http://localhost/")
-		if err != nil {
-			t.Error(err)
-		}
-		want := []byte("hi")
-		conn.Write(want)
-		var got = make([]byte, 512)
-		_, err = conn.Read(got)
-		if err != nil {
-			t.Error(err)
-		}
-		if !strings.HasPrefix(string(got), string(want)) {
-			t.Errorf("expected %s to equal %s", string(got), string(want))
-		}
-		if err := app.Shutdown(); err != nil {
-			t.Error(err)
-		}
-	}()
-	if err := app.Run(":8080"); err != http.ErrServerClosed {
-		t.Errorf("expected %v to equal %v", err, http.ErrServerClosed)
-	}
 }
 
 func TestPUT(t *testing.T) {
