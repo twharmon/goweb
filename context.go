@@ -2,6 +2,7 @@ package goweb
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -199,4 +200,19 @@ func (c *Context) Empty() *EmptyResponse {
 	return &EmptyResponse{
 		context: c,
 	}
+}
+
+// Push pushes the asset at the given path.
+func (c *Context) Push(path string) error {
+	if pusher, ok := c.ResponseWriter.(http.Pusher); ok {
+		options := &http.PushOptions{
+			Header: http.Header{
+				acceptEncodingHeader: c.Request.Header["Accept-Encoding"],
+			},
+		}
+		if err := pusher.Push(path, options); err != nil {
+			return fmt.Errorf("failed to push: %w", err)
+		}
+	}
+	return nil
 }

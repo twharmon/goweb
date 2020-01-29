@@ -18,7 +18,6 @@ const (
 	contentTypeHeader          = "Content-Type"
 	contentTypeApplicationJSON = "application/json; charset=utf-8"
 	contentTypeTextPlain       = "text/plain; charset=utf-8"
-	contentTypeWasm            = "application/wasm"
 )
 
 // JSONResponse implements Responder interface.
@@ -75,7 +74,13 @@ func (r *FileResponse) Respond() {
 		return
 	}
 
-	fi, err := os.Stat(r.path)
+	f, err := os.Open(r.path)
+	if err != nil {
+		r.context.LogError(fmt.Errorf("unable to open file: %w", err))
+		http.ServeFile(r.context.ResponseWriter, r.context.Request, r.path)
+		return
+	}
+	fi, err := f.Stat()
 	if err != nil {
 		r.context.LogError(fmt.Errorf("unable to stat file: %w", err))
 		http.ServeFile(r.context.ResponseWriter, r.context.Request, r.path)
@@ -94,7 +99,13 @@ func (r *FileResponse) Respond() {
 	}
 
 	r.context.ResponseWriter.Header().Set(contentEncodingHeader, contentEncodingGzip)
-	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeWasm)
+	data := make([]byte, 512)
+	if _, err := f.Read(data); err != nil {
+		r.context.LogError(fmt.Errorf("file read error: %w", err))
+		http.ServeFile(r.context.ResponseWriter, r.context.Request, r.path)
+		return
+	}
+	r.context.ResponseWriter.Header().Set(contentTypeHeader, http.DetectContentType(data))
 	http.ServeFile(r.context.ResponseWriter, r.context.Request, gzipPath)
 }
 
