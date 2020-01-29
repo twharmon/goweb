@@ -24,6 +24,7 @@ const (
 // Engine contains routing and logging information for your
 // app.
 type Engine struct {
+	server        *http.Server
 	getRoutes     []*route
 	putRoutes     []*route
 	postRoutes    []*route
@@ -266,7 +267,16 @@ func (e *Engine) AddStdLogger(level LogLevel) {
 
 // Run starts a server on the given port.
 func (e *Engine) Run(port string) error {
-	return http.ListenAndServe(port, e)
+	e.server = &http.Server{
+		Addr:    port,
+		Handler: e,
+	}
+	return e.server.ListenAndServe()
+}
+
+// Shutdown shuts down the server.
+func (e *Engine) Shutdown() error {
+	return e.server.Shutdown(context.TODO())
 }
 
 // RunTLS starts a server on port :443.
@@ -284,15 +294,15 @@ func (e *Engine) RunTLS(config *TLSConfig) error {
 	if !config.AllowHTTP {
 		go http.ListenAndServe(":http", m.HTTPHandler(nil))
 	}
-	s := &http.Server{
+	e.server = &http.Server{
 		Addr:      ":https",
 		TLSConfig: m.TLSConfig(),
 		Handler:   e,
 	}
-	return s.ListenAndServeTLS("", "")
+	return e.server.ListenAndServeTLS("", "")
 }
 
-// DirCache creates a cache for Let's Encrypt certicicates.
+// DirCache creates a cache for Let's Encrypt certificates.
 func DirCache(dir string) autocert.Cache {
 	return autocert.DirCache(dir)
 }

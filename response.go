@@ -40,6 +40,11 @@ type TextResponse struct {
 	body    string
 }
 
+// EmptyResponse implements Responder interface.
+type EmptyResponse struct {
+	context *Context
+}
+
 // Responder is the Responder interface that responds to
 // HTTP requests.
 type Responder interface {
@@ -51,6 +56,11 @@ func (r *JSONResponse) Respond() {
 	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeApplicationJSON)
 	r.context.ResponseWriter.WriteHeader(r.context.status)
 	json.NewEncoder(r.context.ResponseWriter).Encode(r.body)
+}
+
+// Respond sends a JSON response.
+func (r *EmptyResponse) Respond() {
+	r.context.ResponseWriter.WriteHeader(r.context.status)
 }
 
 // Respond sends a file response.

@@ -24,12 +24,6 @@ func (c *Context) Status(status int) *Context {
 	return c
 }
 
-// OK sets the response status to 200.
-func (c *Context) OK() *Context {
-	c.status = http.StatusOK
-	return c
-}
-
 // Created sets the response status to 201.
 func (c *Context) Created() *Context {
 	c.status = http.StatusCreated
@@ -200,7 +194,9 @@ func (c *Context) File(path string) *FileResponse {
 	}
 }
 
-// Respond returns an empty response.
-func (c *Context) Respond() {
-	c.ResponseWriter.WriteHeader(c.status)
+// Empty returns a EmptyResponse.
+func (c *Context) Empty() *EmptyResponse {
+	return &EmptyResponse{
+		context: c,
+	}
 }

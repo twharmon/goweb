@@ -13,7 +13,7 @@ func main() {
 }
 
 func hello(c *goweb.Context) goweb.Responder {
-	return c.OK().JSON(goweb.Map{
+	return c.JSON(goweb.Map{
 		"hello": "world",
 	})
 }
