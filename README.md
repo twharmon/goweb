@@ -41,10 +41,14 @@ For full documentation see [godoc](https://godoc.org/github.com/twharmon/goweb).
 
 ## Benchmarks
 Goweb is built on Golang's standard library.
-Frameworks that significantly beat Goweb usually depend on packages like fasthttp/fasthttprouter.
+Frameworks that significantly beat Goweb usually depend on packages like `fasthttp`/`fasthttprouter`.
 These are great packages, but they also have some limitations.
-- fasthttp does not support HTTP/2 (yet). This means packages like autocert will not work with fasthttp.
-- fasthttprouter (and others) does not allow you to register static routes and parameters for the same path segment. For example, `/posts/{id}` and `/post/new` can not both be registered.
+First, `fasthttp` does not support HTTP/2 (yet).
+Second, no HTTP/2 support means packages like autocert will also not work with `fasthttp`.
+Third, `fasthttprouter` does not allow you to register static routes and parameters for the same path segment.
+For example, `/posts/{id}` and `/post/new` can not both be registered.
+
+Goweb avoids these limitations by using the standard library's `net/http` instead of `fasthttp`/`fasthttprouter`.
 
 Plaintext response "hello world" Requests/sec:
 ```
