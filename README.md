@@ -50,14 +50,14 @@ For example, `/posts/{id}` and `/post/new` can not both be registered.
 
 Goweb avoids these limitations by using the standard library's `net/http` instead of `fasthttp`/`fasthttprouter`.
 
-Plaintext response "hello world" Requests/sec:
+Plaintext response "hello world" (requests/sec):
 ```
 Goweb       79649.12
 Gin         81365.57
 Gorilla     77746.85
 ```
 
-JSON response 100 posts Requests/sec:
+JSON response 100 posts (requests/sec):
 ```
 Goweb       15089.02
 Gin         13191.71
@@ -65,7 +65,7 @@ Gorilla     12836.61
 ```
 
 
-JSON response with path parameter Requests/sec:
+JSON response with path parameter (requests/sec):
 ```
 Goweb       71947.38
 Gin         72422.31
