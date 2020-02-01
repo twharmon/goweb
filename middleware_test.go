@@ -12,12 +12,11 @@ func TestPassThroughMiddleware(t *testing.T) {
 		return c.Text(c.Get("foo").(string))
 	}
 	app := goweb.New()
-	mw := goweb.NewMiddleware()
-	mw.Use(func(c *goweb.Context) goweb.Responder {
+	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
 		c.Set("foo", "bar")
 		return nil
 	})
-	app.GET("/", mw.Apply(handler))
+	mw.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "bar")
 }
 
@@ -26,10 +25,9 @@ func TestInterruptingMiddleware(t *testing.T) {
 		return c.Empty()
 	}
 	app := goweb.New()
-	mw := goweb.NewMiddleware()
-	mw.Use(func(c *goweb.Context) goweb.Responder {
+	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
 		return c.BadRequest().Empty()
 	})
-	app.GET("/", mw.Apply(handler))
+	mw.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusBadRequest, "")
 }

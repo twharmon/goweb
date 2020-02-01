@@ -135,6 +135,14 @@ func (e *Engine) WebSocket(path string, handler websocket.Handler) {
 	e.registerWebSocketRoute(path, handler)
 }
 
+// Middleware returns a new middleware chain.
+func (e *Engine) Middleware(middleware ...Handler) *Middleware {
+	return &Middleware{
+		chain:  middleware,
+		engine: e,
+	}
+}
+
 // ServeFiles will serve files from the given directory
 // with the given path.
 func (e *Engine) ServeFiles(path string, directory string) {

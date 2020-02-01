@@ -14,11 +14,3 @@ func New() *Engine {
 		},
 	}
 }
-
-// NewMiddleware returns a new MiddlewareChain that can be
-// applied to any Handler.
-func NewMiddleware() *Middleware {
-	return &Middleware{
-		chain: []Handler{},
-	}
-}

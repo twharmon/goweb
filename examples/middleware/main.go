@@ -15,11 +15,10 @@ type User struct {
 func main() {
 	app := goweb.New()
 
-	auth := goweb.NewMiddleware()
-	auth.Use(isAuthUser, isNotGopher)
+	auth := app.Middleware(isAuthUser, isNotGopher)
 
 	app.GET("/", hello)
-	app.GET("/user/{name}", auth.Apply(getUser))
+	auth.GET("/user/{name}", getUser)
 
 	app.Run(":8080")
 }
