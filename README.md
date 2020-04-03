@@ -18,7 +18,7 @@ Goweb aims to
 
 ## Usage
 See [examples](https://github.com/twharmon/goweb/tree/master/examples).
-```
+```go
 package main
 
 import (
