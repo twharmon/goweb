@@ -245,30 +245,28 @@ func TestWS(t *testing.T) {
 	app.WebSocket("/ws", func(c *websocket.Conn) {
 		io.Copy(c, c)
 	})
-	go func() {
-		origin := "http://localhost/"
-		url := "ws://localhost:8080/ws"
-		ws, err := websocket.Dial(url, "", origin)
-		if err != nil {
-			t.Fatal(err)
-		}
-		want := "hello world"
-		if _, err := ws.Write([]byte(want)); err != nil {
-			t.Fatal(err)
-		}
-		var got = make([]byte, 512)
-		var n int
-		if n, err = ws.Read(got); err != nil {
-			t.Fatal(err)
-		}
-		got = got[:n]
-		if string(want) != string(got) {
-			t.Fatalf("expected %s to equal %s", string(want), string(got))
-		}
-		err = app.Shutdown()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}()
-	app.Run(":8080")
+	go app.Run(":8080")
+	origin := "http://localhost/"
+	url := "ws://localhost:8080/ws"
+	ws, err := websocket.Dial(url, "", origin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := "hello world"
+	if _, err := ws.Write([]byte(want)); err != nil {
+		t.Fatal(err)
+	}
+	var got = make([]byte, 512)
+	var n int
+	if n, err = ws.Read(got); err != nil {
+		t.Fatal(err)
+	}
+	got = got[:n]
+	if string(want) != string(got) {
+		t.Fatalf("expected %s to equal %s", string(want), string(got))
+	}
+	err = app.Shutdown()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
