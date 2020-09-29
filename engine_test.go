@@ -1,7 +1,6 @@
 package goweb_test
 
 import (
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -208,33 +207,4 @@ func TestParamsNotFound(t *testing.T) {
 	app := goweb.New(nil)
 	app.GET("/hello/{name}/{age}", handler)
 	assert(t, app, "GET", "/hello/Gopher/5", nil, nil, http.StatusOK, " 5")
-}
-
-func TestNoWWW(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
-	}
-	app := goweb.New(&goweb.Config{
-		RedirectWWWToNakedDomain: true,
-	})
-	app.GET("/", handler)
-	transformer := func(r *http.Request) {
-		r.Host = "www.example.com"
-	}
-	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"http://example.com/\">Moved Permanently</a>.\n\n")
-}
-
-func TestRedirectWWWTLS(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
-	}
-	app := goweb.New(&goweb.Config{
-		RedirectWWWToNakedDomain: true,
-	})
-	app.GET("/", handler)
-	transformer := func(r *http.Request) {
-		r.Host = "www.example.com"
-		r.TLS = &tls.ConnectionState{}
-	}
-	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"https://example.com/\">Moved Permanently</a>.\n\n")
 }
