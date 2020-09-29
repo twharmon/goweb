@@ -2,7 +2,6 @@ package goweb
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -15,7 +14,7 @@ type Context struct {
 	Request        *http.Request
 	params         params
 	store          Map
-	loggers        []Logger
+	logger         Logger
 	status         int
 }
 
@@ -107,67 +106,67 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 	http.SetCookie(c.ResponseWriter, cookie)
 }
 
-// LogDebug logs the given messages for all loggers where
+// LogDebug logs the given messages for the logger where
 // ShouldLog(LogLevelDebug) method returns true.
-func (c *Context) LogDebug(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelDebug, message)
+func (c *Context) LogDebug(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelDebug, messages...)
 	}
 }
 
-// LogInfo logs the given messages for all loggers where
+// LogInfo logs the given messages for the logger where
 // ShouldLog(LogLevelInfo) method returns true.
-func (c *Context) LogInfo(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelInfo, message)
+func (c *Context) LogInfo(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelInfo, messages...)
 	}
 }
 
-// LogNotice logs the given messages for all loggers where
+// LogNotice logs the given messages for the logger where
 // ShouldLog(LogLevelNotice) method returns true.
-func (c *Context) LogNotice(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelNotice, message)
+func (c *Context) LogNotice(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelNotice, messages...)
 	}
 }
 
-// LogWarning logs the given messages for all loggers where
+// LogWarning logs the given messages for the logger where
 // ShouldLog(LogLevelWarning) method returns true.
-func (c *Context) LogWarning(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelWarning, message)
+func (c *Context) LogWarning(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelWarning, messages...)
 	}
 }
 
-// LogError logs the given messages for all loggers where
+// LogError logs the given messages for the logger where
 // ShouldLog(LogLevelError) method returns true.
-func (c *Context) LogError(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelError, message)
+func (c *Context) LogError(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelError, messages...)
 	}
 }
 
-// LogAlert logs the given messages for all loggers where
+// LogAlert logs the given messages for the logger where
 // ShouldLog(LogLevelAlert) method returns true.
-func (c *Context) LogAlert(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelAlert, message)
+func (c *Context) LogAlert(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelAlert, messages...)
 	}
 }
 
-// LogCritical logs the given messages for all loggers where
+// LogCritical logs the given messages for the logger where
 // ShouldLog(LogLevelCritical) method returns true.
-func (c *Context) LogCritical(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelCritical, message)
+func (c *Context) LogCritical(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelCritical, messages...)
 	}
 }
 
-// LogEmergency logs the given messages for all loggers where
+// LogEmergency logs the given messages for the logger where
 // ShouldLog(LogLevelEmergency) method returns true.
-func (c *Context) LogEmergency(message interface{}) {
-	for _, l := range c.loggers {
-		l.Log(c, LogLevelEmergency, message)
+func (c *Context) LogEmergency(messages ...interface{}) {
+	if c.logger != nil {
+		c.logger.Log(c, LogLevelEmergency, messages...)
 	}
 }
 
@@ -200,19 +199,4 @@ func (c *Context) Empty() *EmptyResponse {
 	return &EmptyResponse{
 		context: c,
 	}
-}
-
-// Push pushes the asset at the given path.
-func (c *Context) Push(path string) error {
-	if pusher, ok := c.ResponseWriter.(http.Pusher); ok {
-		options := &http.PushOptions{
-			Header: http.Header{
-				acceptEncodingHeader: c.Request.Header["Accept-Encoding"],
-			},
-		}
-		if err := pusher.Push(path, options); err != nil {
-			return fmt.Errorf("failed to push: %w", err)
-		}
-	}
-	return nil
 }

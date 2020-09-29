@@ -19,6 +19,14 @@ func (m *Middleware) apply(handler Handler) Handler {
 	}
 }
 
+// Middleware returns a new middleware chain.
+func (m *Middleware) Middleware(middleware ...Handler) *Middleware {
+	return &Middleware{
+		chain:  append(m.chain, middleware...),
+		engine: m.engine,
+	}
+}
+
 // GET registers a route for method GET.
 func (m *Middleware) GET(path string, handler Handler) {
 	m.engine.GET(path, m.apply(handler))

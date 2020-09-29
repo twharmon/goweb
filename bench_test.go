@@ -42,7 +42,7 @@ func init() {
 		})
 	}
 
-	gowebApp = goweb.New()
+	gowebApp = goweb.New(nil)
 	gowebApp.GET("/plaintext", func(c *goweb.Context) goweb.Responder {
 		return c.Text(plainTextBody)
 	})
@@ -139,7 +139,6 @@ func BenchmarkGowebPlaintext(b *testing.B) {
 		rr := httptest.NewRecorder()
 		gowebApp.ServeHTTP(rr, req)
 		equals(b, rr.Code, http.StatusOK)
-		equals(b, rr.Body.String(), plainTextBody)
 	}
 }
 
@@ -151,7 +150,6 @@ func BenchmarkGinPlaintext(b *testing.B) {
 		rr := httptest.NewRecorder()
 		ginApp.ServeHTTP(rr, req)
 		equals(b, rr.Code, http.StatusOK)
-		equals(b, rr.Body.String(), plainTextBody)
 	}
 }
 
@@ -163,7 +161,6 @@ func BenchmarkGorillaPlaintext(b *testing.B) {
 		rr := httptest.NewRecorder()
 		gorillaApp.ServeHTTP(rr, req)
 		equals(b, rr.Code, http.StatusOK)
-		equals(b, rr.Body.String(), plainTextBody)
 	}
 }
 
@@ -175,7 +172,6 @@ func BenchmarkEchoPlaintext(b *testing.B) {
 		rr := httptest.NewRecorder()
 		echoApp.ServeHTTP(rr, req)
 		equals(b, rr.Code, http.StatusOK)
-		equals(b, rr.Body.String(), plainTextBody)
 	}
 }
 
@@ -187,7 +183,6 @@ func BenchmarkMartiniPlaintext(b *testing.B) {
 		rr := httptest.NewRecorder()
 		martiniApp.ServeHTTP(rr, req)
 		equals(b, rr.Code, http.StatusOK)
-		equals(b, rr.Body.String(), plainTextBody)
 	}
 }
 
