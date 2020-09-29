@@ -13,7 +13,7 @@ type User struct {
 }
 
 func main() {
-	app := goweb.New()
+	app := goweb.New(nil)
 
 	auth := app.Middleware(isAuthUser, isNotGopher)
 

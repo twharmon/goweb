@@ -6,9 +6,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-
-	"golang.org/x/crypto/acme/autocert"
-	"golang.org/x/net/websocket"
 )
 
 const (
@@ -35,7 +32,7 @@ type Engine struct {
 
 	notFoundHandler Handler
 
-	loggers []Logger
+	logger Logger
 
 	redirectWWW bool
 }
@@ -67,12 +64,7 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 func getRouteFromPath(path string) *route {
 	rt := new(route)
 	if path[0] != '/' {
-		parts := strings.Split(path, "/")
-		if len(parts) == 1 {
-			panic("path '" + path + "' does not start with '/'")
-		}
-		rt.host = parts[0]
-		path = "/" + strings.Join(parts[1:], "/")
+		panic("path '" + path + "' does not start with '/'")
 	}
 	pathRegExpStr := "^" + path + "$"
 	matches := paramNameRegExp.FindAllStringSubmatch(path, -1)
@@ -86,13 +78,6 @@ func getRouteFromPath(path string) *route {
 	}
 	rt.regexp = regexp.MustCompile(pathRegExpStr)
 	return rt
-}
-
-func (e *Engine) registerWebSocketRoute(path string, handler websocket.Handler) {
-	rt := getRouteFromPath(path)
-	rt.webSocketHandler = handler
-	rt.method = methodGET
-	e.getRoutes = append(e.getRoutes, rt)
 }
 
 // GET registers a route for method GET.
@@ -128,11 +113,6 @@ func (e *Engine) OPTIONS(path string, handler Handler) {
 // HEAD registers a route for method HEAD.
 func (e *Engine) HEAD(path string, handler Handler) {
 	e.registerRoute(methodHEAD, path, handler)
-}
-
-// WebSocket registers a route for websockets.
-func (e *Engine) WebSocket(path string, handler websocket.Handler) {
-	e.registerWebSocketRoute(path, handler)
 }
 
 // Middleware returns a new middleware chain.
@@ -226,12 +206,11 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 	c := &Context{
 		ResponseWriter: w,
 		Request:        r,
-		loggers:        e.loggers,
+		logger:         e.logger,
 		status:         http.StatusOK,
 	}
 	for _, route := range routes {
-		hostMatches := route.host == "" || route.host == r.Host
-		if hostMatches && route.regexp.MatchString(r.URL.Path) {
+		if route.regexp.MatchString(r.URL.Path) {
 			c.store = make(Map)
 			matches := route.regexp.FindAllStringSubmatch(r.URL.Path, -1)
 			for i := 1; i < len(matches[0]); i++ {
@@ -240,12 +219,8 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 					value: matches[0][i],
 				})
 			}
-			if route.webSocketHandler != nil {
-				route.webSocketHandler.ServeHTTP(w, r)
-			} else {
-				if res := route.handler(c); res != nil {
-					res.Respond()
-				}
+			if res := route.handler(c); res != nil {
+				res.Respond()
 			}
 			return
 		}
@@ -253,24 +228,6 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 	if res := e.notFoundHandler(c); res != nil {
 		res.Respond()
 	}
-}
-
-// RedirectWWW redirects all requests to the non-www host.
-func (e *Engine) RedirectWWW() {
-	e.redirectWWW = true
-}
-
-// AddCustomLogger adds a Logger to the Engine.
-func (e *Engine) AddCustomLogger(logger Logger) {
-	e.loggers = append(e.loggers, logger)
-}
-
-// AddStdLogger adds a logger that will output log messages
-// with log.Println.
-func (e *Engine) AddStdLogger(level LogLevel) {
-	e.loggers = append(e.loggers, &stdLogger{
-		minLevel: level,
-	})
 }
 
 // Run starts a server on the given port.
@@ -285,32 +242,4 @@ func (e *Engine) Run(port string) error {
 // Shutdown shuts down the server.
 func (e *Engine) Shutdown() error {
 	return e.server.Shutdown(context.TODO())
-}
-
-// RunTLS starts a server on port :443.
-func (e *Engine) RunTLS(config *TLSConfig) error {
-	if config.Cache == nil {
-		config.Cache = autocert.DirCache("certs")
-	}
-	m := &autocert.Manager{
-		Cache:  config.Cache,
-		Prompt: autocert.AcceptTOS,
-		HostPolicy: func(_ context.Context, host string) error {
-			return config.HostPolicy(host)
-		},
-	}
-	if !config.AllowHTTP {
-		go http.ListenAndServe(":http", m.HTTPHandler(nil))
-	}
-	e.server = &http.Server{
-		Addr:      ":https",
-		TLSConfig: m.TLSConfig(),
-		Handler:   e,
-	}
-	return e.server.ListenAndServeTLS("", "")
-}
-
-// DirCache creates a cache for Let's Encrypt certificates.
-func DirCache(dir string) autocert.Cache {
-	return autocert.DirCache(dir)
 }

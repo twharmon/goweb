@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	app := goweb.New()
+	app := goweb.New(nil)
 
 	app.GET("/hello", func(c *goweb.Context) goweb.Responder {
 		return c.JSON(goweb.Map{

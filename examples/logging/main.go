@@ -9,13 +9,9 @@ import (
 )
 
 func main() {
-	app := goweb.New()
-
-	// uses std lib "log"
-	app.AddStdLogger(goweb.LogLevelDebug)
-
-	// create your own logger
-	app.AddCustomLogger(&myLogger{goweb.LogLevelNotice})
+	app := goweb.New(&goweb.Config{
+		Logger: &myLogger{},
+	})
 
 	app.GET("/divide/{a}/by/{b}", divide)
 
@@ -35,19 +31,17 @@ func divide(c *goweb.Context) goweb.Responder {
 	}
 
 	if b == 0 {
-		c.LogEmergency("division by zero")
+		c.LogEmergency("division by zero", 5, "asdf")
 		return c.BadRequest().Text("can not divide by zero")
 	}
 
 	return c.Text(fmt.Sprintf("%f", a/b))
 }
 
-type myLogger struct {
-	minLevel goweb.LogLevel
-}
+type myLogger struct{}
 
-func (l *myLogger) Log(_ *goweb.Context, logLevel goweb.LogLevel, message interface{}) {
-	if logLevel >= l.minLevel {
-		log.Printf("Notice - %v", message)
-	}
+func (l *myLogger) Log(_ *goweb.Context, logLevel goweb.LogLevel, messages ...interface{}) {
+	prefix := fmt.Sprintf("[%s]", logLevel)
+	messages = append([]interface{}{prefix}, messages...)
+	log.Println(messages...)
 }

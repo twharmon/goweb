@@ -13,15 +13,12 @@ import (
 )
 
 type testLogger struct {
-	minLevel goweb.LogLevel
-	out      *bytes.Buffer
-	log      *log.Logger
+	out *bytes.Buffer
+	log *log.Logger
 }
 
-func (l *testLogger) Log(_ *goweb.Context, level goweb.LogLevel, msg interface{}) {
-	if level >= l.minLevel {
-		l.log.Print(msg)
-	}
+func (l *testLogger) Log(_ *goweb.Context, level goweb.LogLevel, msgs ...interface{}) {
+	l.log.Print(msgs...)
 }
 
 var stdLoggerOut bytes.Buffer
@@ -31,9 +28,8 @@ func init() {
 	log.SetFlags(0)
 }
 
-func newLogger(level goweb.LogLevel) *testLogger {
+func newLogger() *testLogger {
 	l := new(testLogger)
-	l.minLevel = level
 	l.out = bytes.NewBuffer(nil)
 	l.log = log.New(l.out, "", 0)
 	return l

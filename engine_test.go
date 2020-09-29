@@ -3,13 +3,10 @@ package goweb_test
 import (
 	"crypto/tls"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
-
-	"golang.org/x/net/websocket"
 
 	"github.com/twharmon/goweb"
 )
@@ -18,7 +15,7 @@ func TestGET(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
@@ -27,7 +24,7 @@ func TestPUT(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.PUT("/", handler)
 	assert(t, app, "PUT", "/", nil, nil, http.StatusOK, "")
 }
@@ -36,7 +33,7 @@ func TestPATCH(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.PATCH("/", handler)
 	assert(t, app, "PATCH", "/", nil, nil, http.StatusOK, "")
 }
@@ -45,7 +42,7 @@ func TestPOST(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.POST("/", handler)
 	assert(t, app, "POST", "/", nil, nil, http.StatusOK, "")
 }
@@ -54,7 +51,7 @@ func TestDELETE(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.DELETE("/", handler)
 	assert(t, app, "DELETE", "/", nil, nil, http.StatusOK, "")
 }
@@ -63,7 +60,7 @@ func TestOPTIONS(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.OPTIONS("/", handler)
 	assert(t, app, "OPTIONS", "/", nil, nil, http.StatusOK, "")
 }
@@ -72,7 +69,7 @@ func TestHEAD(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.HEAD("/", handler)
 	assert(t, app, "HEAD", "/", nil, nil, http.StatusOK, "")
 }
@@ -84,7 +81,7 @@ func TestPostParamRoute(t *testing.T) {
 	correctHandler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/a/{b}", wrongHandler)
 	app.GET("/a/{b}/c", correctHandler)
 	assert(t, app, "GET", "/a/b/c", nil, nil, http.StatusOK, "")
@@ -94,7 +91,7 @@ func TestMultiParamRoute(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/a/{b}/c/{d}", handler)
 	assert(t, app, "GET", "/a/b/c/d", nil, nil, http.StatusOK, "")
 }
@@ -105,7 +102,7 @@ func TestServeFiles(t *testing.T) {
 	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
 		t.Error(err)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.ServeFiles("/", ".")
 	assert(t, app, "GET", "/test.txt", nil, nil, http.StatusOK, content)
 	os.Remove("./test.txt")
@@ -117,7 +114,7 @@ func TestServeFilesIndex(t *testing.T) {
 	if err := ioutil.WriteFile("./index.html", data, 0700); err != nil {
 		t.Error(err)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.ServeFiles("/", ".")
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, content)
 	os.Remove("./index.html")
@@ -129,7 +126,7 @@ func TestGzipAndServeFiles(t *testing.T) {
 	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
 		t.Error(err)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GzipAndServeFiles("/", ".", 10)
 	assertOK(t, app, "GET", "/test.txt", nil, nil, http.StatusOK)
 	os.Remove("./test.txt")
@@ -142,7 +139,7 @@ func TestGzipAndServeFilesIndex(t *testing.T) {
 	if err := ioutil.WriteFile("./index.html", data, 0700); err != nil {
 		t.Error(err)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GzipAndServeFiles("/", ".", 10)
 	transformer := func(r *http.Request) {
 		r.Header.Set("Accept-Encoding", "gzip")
@@ -156,7 +153,7 @@ func TestRouteNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "Page not found")
 }
@@ -165,7 +162,7 @@ func TestCustomNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	app.NotFound(func(c *goweb.Context) goweb.Responder {
 		return c.NotFound().Empty()
@@ -177,7 +174,7 @@ func TestEmptyPath(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	assertPanic(t, func() {
 		app.GET("", handler)
 	})
@@ -187,7 +184,7 @@ func TestNonSlashLeadingPath(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	assertPanic(t, func() {
 		app.GET("foo", handler)
 	})
@@ -198,7 +195,7 @@ func TestParams(t *testing.T) {
 		res := fmt.Sprintf("%s %s", c.Param("name"), c.Param("age"))
 		return c.Text(res)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/hello/{name}/{age}", handler)
 	assert(t, app, "GET", "/hello/Gopher/5", nil, nil, http.StatusOK, "Gopher 5")
 }
@@ -208,7 +205,7 @@ func TestParamsNotFound(t *testing.T) {
 		res := fmt.Sprintf("%s %s", c.Param("name_"), c.Param("age"))
 		return c.Text(res)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/hello/{name}/{age}", handler)
 	assert(t, app, "GET", "/hello/Gopher/5", nil, nil, http.StatusOK, " 5")
 }
@@ -217,8 +214,9 @@ func TestNoWWW(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.RedirectWWW()
+	app := goweb.New(&goweb.Config{
+		RedirectWWWToNakedDomain: true,
+	})
 	app.GET("/", handler)
 	transformer := func(r *http.Request) {
 		r.Host = "www.example.com"
@@ -230,43 +228,13 @@ func TestRedirectWWWTLS(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.RedirectWWW()
+	app := goweb.New(&goweb.Config{
+		RedirectWWWToNakedDomain: true,
+	})
 	app.GET("/", handler)
 	transformer := func(r *http.Request) {
 		r.Host = "www.example.com"
 		r.TLS = &tls.ConnectionState{}
 	}
 	assert(t, app, "GET", "/", nil, transformer, http.StatusMovedPermanently, "<a href=\"https://example.com/\">Moved Permanently</a>.\n\n")
-}
-
-func TestWS(t *testing.T) {
-	app := goweb.New()
-	app.WebSocket("/ws", func(c *websocket.Conn) {
-		io.Copy(c, c)
-	})
-	go app.Run(":8080")
-	origin := "http://localhost/"
-	url := "ws://localhost:8080/ws"
-	ws, err := websocket.Dial(url, "", origin)
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := "hello world"
-	if _, err := ws.Write([]byte(want)); err != nil {
-		t.Fatal(err)
-	}
-	var got = make([]byte, 512)
-	var n int
-	if n, err = ws.Read(got); err != nil {
-		t.Fatal(err)
-	}
-	got = got[:n]
-	if string(want) != string(got) {
-		t.Fatalf("expected %s to equal %s", string(want), string(got))
-	}
-	err = app.Shutdown()
-	if err != nil {
-		t.Fatal(err)
-	}
 }

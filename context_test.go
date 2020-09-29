@@ -15,7 +15,7 @@ func TestOKEmpty(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
@@ -24,7 +24,7 @@ func TestStatus(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Status(http.StatusTeapot).Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusTeapot, "")
 }
@@ -33,7 +33,7 @@ func TestCreated(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Created().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusCreated, "")
 }
@@ -42,7 +42,7 @@ func TestBadRequest(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.BadRequest().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusBadRequest, "")
 }
@@ -51,7 +51,7 @@ func TestUnauthorized(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Unauthorized().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusUnauthorized, "")
 }
@@ -60,7 +60,7 @@ func TestForbidden(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Forbidden().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusForbidden, "")
 }
@@ -69,7 +69,7 @@ func TestNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.NotFound().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusNotFound, "")
 }
@@ -78,7 +78,7 @@ func TestConflict(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Conflict().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusConflict, "")
 }
@@ -87,7 +87,7 @@ func TestUnprocessableEntity(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.UnprocessableEntity().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusUnprocessableEntity, "")
 }
@@ -96,7 +96,7 @@ func TestInternalServerError(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.InternalServerError().Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusInternalServerError, "")
 }
@@ -105,7 +105,7 @@ func TestQuery(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Text(c.Query("foo"))
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	assert(t, app, "GET", "/?foo=bar", nil, nil, http.StatusOK, "bar")
 }
@@ -119,7 +119,7 @@ func TestJSON(t *testing.T) {
 			Hello: "world",
 		})
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	resBody := "{\"hello\":\"world\"}\n"
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, resBody)
@@ -131,7 +131,7 @@ func TestFile(t *testing.T) {
 	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
 		t.Error(err)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", func(c *goweb.Context) goweb.Responder {
 		return c.File("test.txt")
 	})
@@ -151,7 +151,7 @@ func TestParseJSON(t *testing.T) {
 		}
 		return c.JSON(&msg)
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.POST("/", handler)
 	assert(t, app, "POST", "/", strings.NewReader(body), nil, http.StatusOK, body)
 }
@@ -164,7 +164,7 @@ func TestSetCookie(t *testing.T) {
 		})
 		return c.Empty()
 	}
-	app := goweb.New()
+	app := goweb.New(nil)
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -185,9 +185,10 @@ func TestLogDebug(t *testing.T) {
 		c.LogDebug(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelDebug)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -198,9 +199,10 @@ func TestLogInfo(t *testing.T) {
 		c.LogInfo(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelInfo)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -211,9 +213,10 @@ func TestLogNotice(t *testing.T) {
 		c.LogNotice(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelNotice)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -224,9 +227,10 @@ func TestLogWarning(t *testing.T) {
 		c.LogWarning(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelWarning)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -237,9 +241,10 @@ func TestLogError(t *testing.T) {
 		c.LogError(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelError)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -250,9 +255,10 @@ func TestLogAlert(t *testing.T) {
 		c.LogAlert(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelAlert)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -263,9 +269,10 @@ func TestLogCritical(t *testing.T) {
 		c.LogCritical(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelCritical)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
@@ -276,23 +283,12 @@ func TestLogEmergency(t *testing.T) {
 		c.LogEmergency(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelEmergency)
-	app.AddCustomLogger(l)
+	l := newLogger()
+	app := goweb.New(&goweb.Config{
+		Logger: l,
+	})
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
-}
-
-func TestLogPassthrough(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		c.LogDebug("this should not get logged")
-		return c.Empty()
-	}
-	app := goweb.New()
-	l := newLogger(goweb.LogLevelInfo)
-	app.AddCustomLogger(l)
-	app.GET("/", handler)
-	assertLog(t, app, "GET", "/", l, "")
 }
 
 func TestStdLoggerDebugQueryString(t *testing.T) {
@@ -301,8 +297,9 @@ func TestStdLoggerDebugQueryString(t *testing.T) {
 		c.LogDebug(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelDebug)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/?var=val", nil)
 	if err != nil {
@@ -321,8 +318,9 @@ func TestStdLoggerDebug(t *testing.T) {
 		c.LogDebug(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelDebug)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -341,8 +339,9 @@ func TestStdLoggerInfo(t *testing.T) {
 		c.LogInfo(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelInfo)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -361,8 +360,9 @@ func TestStdLoggerNotice(t *testing.T) {
 		c.LogNotice(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelNotice)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -381,8 +381,9 @@ func TestStdLoggerWarning(t *testing.T) {
 		c.LogWarning(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelWarning)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -401,8 +402,9 @@ func TestStdLoggerError(t *testing.T) {
 		c.LogError(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelError)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -421,8 +423,9 @@ func TestStdLoggerAlert(t *testing.T) {
 		c.LogAlert(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelAlert)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -441,8 +444,9 @@ func TestStdLoggerCritical(t *testing.T) {
 		c.LogCritical(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelCritical)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
@@ -461,8 +465,9 @@ func TestStdLoggerEmergency(t *testing.T) {
 		c.LogEmergency(logMsg)
 		return c.Empty()
 	}
-	app := goweb.New()
-	app.AddStdLogger(goweb.LogLevelEmergency)
+	app := goweb.New(&goweb.Config{
+		Logger: goweb.DefaultLogger,
+	})
 	app.GET("/", handler)
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {

@@ -32,7 +32,7 @@ const (
 // Logger is an interface that implements
 // Log(level int, message interface{}).
 type Logger interface {
-	Log(ctx *Context, level LogLevel, message interface{})
+	Log(ctx *Context, level LogLevel, messages ...interface{})
 }
 
 func (l LogLevel) String() string {
