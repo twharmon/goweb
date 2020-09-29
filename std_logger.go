@@ -2,7 +2,6 @@ package goweb
 
 import (
 	"fmt"
-	"log"
 )
 
 type stdLogger struct{}
@@ -18,5 +17,5 @@ func (l *stdLogger) Log(c *Context, level LogLevel, messages ...interface{}) {
 	uri := fmt.Sprintf("%s %s%s%s", c.Request.Method, c.Request.Host, c.Request.URL.Path, query)
 	prefix := fmt.Sprintf("[%s] %s -", level, uri)
 	messages = append([]interface{}{prefix}, messages...)
-	log.Println(messages...)
+	fmt.Println(messages...)
 }
