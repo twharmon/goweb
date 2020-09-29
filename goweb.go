@@ -8,8 +8,7 @@ type Handler func(*Context) Responder
 
 // Config configures the app engine.
 type Config struct {
-	RedirectWWWToNakedDomain bool
-	Logger                   Logger
+	Logger Logger
 }
 
 // New returns a new Engine.
@@ -21,7 +20,6 @@ func New(config *Config) *Engine {
 	}
 
 	if config != nil {
-		e.redirectWWW = config.RedirectWWWToNakedDomain
 		e.logger = config.Logger
 	}
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strings"
 )
 
 const (
@@ -33,8 +32,6 @@ type Engine struct {
 	notFoundHandler Handler
 
 	logger Logger
-
-	redirectWWW bool
 }
 
 var paramNameRegExp = regexp.MustCompile(`{([a-zA-Z0-9-]+):?(.*?)}`)
@@ -168,22 +165,6 @@ func (e *Engine) NotFound(handler Handler) {
 
 // ServeHTTP implements the http.Handler interface.
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if e.redirectWWW && strings.HasPrefix(r.Host, "www.") {
-		w.Header().Set("Connection", "close")
-		var scheme string
-		if r.TLS == nil {
-			scheme = "http"
-		} else {
-			scheme = "https"
-		}
-		http.Redirect(
-			w,
-			r,
-			scheme+"://"+strings.TrimPrefix(r.Host, "www.")+r.URL.String(),
-			http.StatusMovedPermanently,
-		)
-		return
-	}
 	switch r.Method {
 	case methodGET:
 		e.serve(w, r, e.getRoutes)
