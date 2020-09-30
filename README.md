@@ -24,7 +24,7 @@ import (
 )
 
 func main() {
-    app := goweb.New(nil)
+    app := goweb.New()
     app.GET("/hello/{name}", hello)
     app.Run(":8080")
 }

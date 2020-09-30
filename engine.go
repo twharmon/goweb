@@ -31,7 +31,7 @@ type Engine struct {
 
 	notFoundHandler Handler
 
-	logger Logger
+	loggers []Logger
 }
 
 var paramNameRegExp = regexp.MustCompile(`{([a-zA-Z0-9-]+):?(.*?)}`)
@@ -187,7 +187,7 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 	c := &Context{
 		ResponseWriter: w,
 		Request:        r,
-		logger:         e.logger,
+		loggers:        e.loggers,
 		status:         http.StatusOK,
 	}
 	for _, route := range routes {
@@ -218,6 +218,11 @@ func (e *Engine) Run(port string) error {
 		Handler: e,
 	}
 	return e.server.ListenAndServe()
+}
+
+// RegisterLogger registers a logger.
+func (e *Engine) RegisterLogger(logger Logger) {
+	e.loggers = append(e.loggers, logger)
 }
 
 // Shutdown shuts down the server.

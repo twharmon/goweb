@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	app := goweb.New(&goweb.Config{
-		Logger: &myLogger{},
-	})
+	app := goweb.New()
+
+	app.RegisterLogger(&myLogger{})
 
 	app.GET("/divide/{a}/by/{b}", divide)
 

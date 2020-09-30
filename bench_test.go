@@ -42,7 +42,7 @@ func init() {
 		})
 	}
 
-	gowebApp = goweb.New(nil)
+	gowebApp = goweb.New()
 	gowebApp.GET("/plaintext", func(c *goweb.Context) goweb.Responder {
 		return c.Text(plainTextBody)
 	})
