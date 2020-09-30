@@ -14,7 +14,7 @@ type Context struct {
 	Request        *http.Request
 	params         params
 	store          Map
-	logger         Logger
+	loggers        []Logger
 	status         int
 }
 
@@ -109,64 +109,64 @@ func (c *Context) SetCookie(cookie *http.Cookie) {
 // LogDebug logs the given messages for the logger where
 // ShouldLog(LogLevelDebug) method returns true.
 func (c *Context) LogDebug(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelDebug, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelDebug, messages...)
 	}
 }
 
 // LogInfo logs the given messages for the logger where
 // ShouldLog(LogLevelInfo) method returns true.
 func (c *Context) LogInfo(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelInfo, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelInfo, messages...)
 	}
 }
 
 // LogNotice logs the given messages for the logger where
 // ShouldLog(LogLevelNotice) method returns true.
 func (c *Context) LogNotice(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelNotice, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelNotice, messages...)
 	}
 }
 
 // LogWarning logs the given messages for the logger where
 // ShouldLog(LogLevelWarning) method returns true.
 func (c *Context) LogWarning(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelWarning, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelWarning, messages...)
 	}
 }
 
 // LogError logs the given messages for the logger where
 // ShouldLog(LogLevelError) method returns true.
 func (c *Context) LogError(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelError, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelError, messages...)
 	}
 }
 
 // LogAlert logs the given messages for the logger where
 // ShouldLog(LogLevelAlert) method returns true.
 func (c *Context) LogAlert(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelAlert, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelAlert, messages...)
 	}
 }
 
 // LogCritical logs the given messages for the logger where
 // ShouldLog(LogLevelCritical) method returns true.
 func (c *Context) LogCritical(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelCritical, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelCritical, messages...)
 	}
 }
 
 // LogEmergency logs the given messages for the logger where
 // ShouldLog(LogLevelEmergency) method returns true.
 func (c *Context) LogEmergency(messages ...interface{}) {
-	if c.logger != nil {
-		c.logger.Log(c, LogLevelEmergency, messages...)
+	for _, l := range c.loggers {
+		l.Log(c, LogLevelEmergency, messages...)
 	}
 }
 
