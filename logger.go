@@ -38,19 +38,19 @@ type Logger interface {
 func (l LogLevel) String() string {
 	switch l {
 	case LogLevelDebug:
-		return "Debug"
+		return "DEBUG"
 	case LogLevelInfo:
-		return "Info"
+		return "INFO"
 	case LogLevelNotice:
-		return "Notice"
+		return "NOTICE"
 	case LogLevelWarning:
-		return "Warning"
+		return "WARNING"
 	case LogLevelError:
-		return "Error"
+		return "ERROR"
 	case LogLevelCritical:
-		return "Critical"
+		return "CRITICAL"
 	case LogLevelAlert:
-		return "Alert"
+		return "ALERT"
 	}
-	return "Emergency"
+	return "EMERGENCY"
 }
