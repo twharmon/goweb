@@ -5,16 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-)
-
-const (
-	methodGET     = "GET"
-	methodPUT     = "PUT"
-	methodPATCH   = "PATCH"
-	methodPOST    = "POST"
-	methodDELETE  = "DELETE"
-	methodOPTIONS = "OPTIONS"
-	methodHEAD    = "HEAD"
+	"strconv"
+	"strings"
 )
 
 // Engine contains routing and logging information for your
@@ -30,6 +22,7 @@ type Engine struct {
 	headRoutes    []*route
 
 	notFoundHandler Handler
+	corsConfig      *CorsConfig
 
 	loggers []Logger
 }
@@ -41,19 +34,17 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 	rt.handler = handler
 	rt.method = method
 	switch method {
-	case methodGET:
+	case http.MethodGet:
 		e.getRoutes = append(e.getRoutes, rt)
-	case methodPUT:
+	case http.MethodPut:
 		e.putRoutes = append(e.putRoutes, rt)
-	case methodPATCH:
+	case http.MethodPatch:
 		e.patchRoutes = append(e.patchRoutes, rt)
-	case methodPOST:
+	case http.MethodPost:
 		e.postRoutes = append(e.postRoutes, rt)
-	case methodDELETE:
+	case http.MethodDelete:
 		e.deleteRoutes = append(e.deleteRoutes, rt)
-	case methodOPTIONS:
-		e.optionsRoutes = append(e.optionsRoutes, rt)
-	case methodHEAD:
+	case http.MethodHead:
 		e.headRoutes = append(e.headRoutes, rt)
 	}
 }
@@ -79,37 +70,32 @@ func getRouteFromPath(path string) *route {
 
 // GET registers a route for method GET.
 func (e *Engine) GET(path string, handler Handler) {
-	e.registerRoute(methodGET, path, handler)
+	e.registerRoute(http.MethodGet, path, handler)
 }
 
 // PUT registers a route for method PUT.
 func (e *Engine) PUT(path string, handler Handler) {
-	e.registerRoute(methodPUT, path, handler)
+	e.registerRoute(http.MethodPut, path, handler)
 }
 
 // POST registers a route for method POST.
 func (e *Engine) POST(path string, handler Handler) {
-	e.registerRoute(methodPOST, path, handler)
+	e.registerRoute(http.MethodPost, path, handler)
 }
 
 // PATCH registers a route for method PATCH.
 func (e *Engine) PATCH(path string, handler Handler) {
-	e.registerRoute(methodPATCH, path, handler)
+	e.registerRoute(http.MethodPatch, path, handler)
 }
 
 // DELETE registers a route for method DELETE.
 func (e *Engine) DELETE(path string, handler Handler) {
-	e.registerRoute(methodDELETE, path, handler)
-}
-
-// OPTIONS registers a route for method OPTIONS.
-func (e *Engine) OPTIONS(path string, handler Handler) {
-	e.registerRoute(methodOPTIONS, path, handler)
+	e.registerRoute(http.MethodDelete, path, handler)
 }
 
 // HEAD registers a route for method HEAD.
 func (e *Engine) HEAD(path string, handler Handler) {
-	e.registerRoute(methodHEAD, path, handler)
+	e.registerRoute(http.MethodHead, path, handler)
 }
 
 // Middleware returns a new middleware chain.
@@ -123,13 +109,13 @@ func (e *Engine) Middleware(middleware ...Handler) *Middleware {
 // ServeFiles will serve files from the given directory
 // with the given path.
 func (e *Engine) ServeFiles(path string, directory string) {
-	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) Responder {
+	e.registerRoute(http.MethodGet, path+"{name:.+}", func(c *Context) Responder {
 		return &FileResponse{
 			path:    directory + "/" + c.Param("name"),
 			context: c,
 		}
 	})
-	e.registerRoute(methodGET, path, func(c *Context) Responder {
+	e.registerRoute(http.MethodGet, path, func(c *Context) Responder {
 		return &FileResponse{
 			path:    directory + "/index.html",
 			context: c,
@@ -141,14 +127,14 @@ func (e *Engine) ServeFiles(path string, directory string) {
 // with the given path. If the file size is greater than the given
 // size, a gzipped version of the file will be created and served.
 func (e *Engine) GzipAndServeFiles(path string, directory string, size int64) {
-	e.registerRoute(methodGET, path+"{name:.+}", func(c *Context) Responder {
+	e.registerRoute(http.MethodGet, path+"{name:.+}", func(c *Context) Responder {
 		return &FileResponse{
 			path:    directory + "/" + c.Param("name"),
 			context: c,
 			gzip:    size,
 		}
 	})
-	e.registerRoute(methodGET, path, func(c *Context) Responder {
+	e.registerRoute(http.MethodGet, path, func(c *Context) Responder {
 		return &FileResponse{
 			path:    directory + "/index.html",
 			context: c,
@@ -163,23 +149,81 @@ func (e *Engine) NotFound(handler Handler) {
 	e.notFoundHandler = handler
 }
 
+// CorsConfig .
+type CorsConfig struct {
+	Origin  string
+	Headers string
+	MaxAge  int
+}
+
+// AutoCors .
+func (e *Engine) AutoCors(config *CorsConfig) {
+	e.corsConfig = config
+}
+
 // ServeHTTP implements the http.Handler interface.
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case methodGET:
+	case http.MethodGet:
 		e.serve(w, r, e.getRoutes)
-	case methodPOST:
+	case http.MethodPost:
 		e.serve(w, r, e.postRoutes)
-	case methodPUT:
+	case http.MethodPut:
 		e.serve(w, r, e.putRoutes)
-	case methodPATCH:
+	case http.MethodPatch:
 		e.serve(w, r, e.patchRoutes)
-	case methodDELETE:
+	case http.MethodDelete:
 		e.serve(w, r, e.deleteRoutes)
-	case methodOPTIONS:
-		e.serve(w, r, e.optionsRoutes)
-	case methodHEAD:
+	case http.MethodHead:
 		e.serve(w, r, e.headRoutes)
+	case http.MethodOptions:
+		if e.corsConfig == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		h := w.Header()
+		h.Set("Access-Control-Allow-Origin", e.corsConfig.Origin)
+		h.Set("Access-Control-Allow-Headers", e.corsConfig.Headers)
+		h.Set("Access-Control-Max-Age", strconv.Itoa(e.corsConfig.MaxAge))
+
+		var methods []string
+		for _, rt := range e.getRoutes {
+			if rt.regexp.MatchString(r.URL.Path) {
+				methods = append(methods, http.MethodGet)
+				break
+			}
+		}
+		for _, rt := range e.putRoutes {
+			if rt.regexp.MatchString(r.URL.Path) {
+				methods = append(methods, http.MethodPut)
+				break
+			}
+		}
+		for _, rt := range e.patchRoutes {
+			if rt.regexp.MatchString(r.URL.Path) {
+				methods = append(methods, http.MethodPatch)
+				break
+			}
+		}
+		for _, rt := range e.postRoutes {
+			if rt.regexp.MatchString(r.URL.Path) {
+				methods = append(methods, http.MethodPost)
+				break
+			}
+		}
+		for _, rt := range e.deleteRoutes {
+			if rt.regexp.MatchString(r.URL.Path) {
+				methods = append(methods, http.MethodDelete)
+				break
+			}
+		}
+		for _, rt := range e.headRoutes {
+			if rt.regexp.MatchString(r.URL.Path) {
+				methods = append(methods, http.MethodHead)
+				break
+			}
+		}
+		h.Set("Access-Control-Allow-Methods", strings.Join(methods, ", "))
 	}
 }
 

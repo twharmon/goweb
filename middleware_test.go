@@ -84,19 +84,6 @@ func TestDELETEMiddleware(t *testing.T) {
 	assert(t, app, "DELETE", "/", nil, nil, http.StatusOK, "bar")
 }
 
-func TestOPTIONSMiddleware(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
-	}
-	app := goweb.New()
-	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
-		c.Set("foo", "bar")
-		return nil
-	})
-	mw.OPTIONS("/", handler)
-	assert(t, app, "OPTIONS", "/", nil, nil, http.StatusOK, "bar")
-}
-
 func TestHEADMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Text(c.Get("foo").(string))
