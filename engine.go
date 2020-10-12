@@ -163,6 +163,10 @@ func (e *Engine) AutoCors(config *CorsConfig) {
 
 // ServeHTTP implements the http.Handler interface.
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if e.corsConfig != nil {
+		h := w.Header()
+		h.Set("Access-Control-Allow-Origin", e.corsConfig.Origin)
+	}
 	switch r.Method {
 	case http.MethodGet:
 		e.serve(w, r, e.getRoutes)
@@ -182,7 +186,6 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h := w.Header()
-		h.Set("Access-Control-Allow-Origin", e.corsConfig.Origin)
 		h.Set("Access-Control-Allow-Headers", e.corsConfig.Headers)
 		h.Set("Access-Control-Max-Age", strconv.Itoa(e.corsConfig.MaxAge))
 
@@ -224,6 +227,7 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		h.Set("Access-Control-Allow-Methods", strings.Join(methods, ", "))
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
