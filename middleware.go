@@ -52,11 +52,6 @@ func (m *Middleware) DELETE(path string, handler Handler) {
 	m.engine.DELETE(path, m.apply(handler))
 }
 
-// OPTIONS registers a route for method OPTIONS.
-func (m *Middleware) OPTIONS(path string, handler Handler) {
-	m.engine.OPTIONS(path, m.apply(handler))
-}
-
 // HEAD registers a route for method HEAD.
 func (m *Middleware) HEAD(path string, handler Handler) {
 	m.engine.HEAD(path, m.apply(handler))

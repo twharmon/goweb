@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"os"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/twharmon/goweb"
@@ -55,15 +58,6 @@ func TestDELETE(t *testing.T) {
 	assert(t, app, "DELETE", "/", nil, nil, http.StatusOK, "")
 }
 
-func TestOPTIONS(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
-	}
-	app := goweb.New()
-	app.OPTIONS("/", handler)
-	assert(t, app, "OPTIONS", "/", nil, nil, http.StatusOK, "")
-}
-
 func TestHEAD(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
@@ -71,6 +65,53 @@ func TestHEAD(t *testing.T) {
 	app := goweb.New()
 	app.HEAD("/", handler)
 	assert(t, app, "HEAD", "/", nil, nil, http.StatusOK, "")
+}
+
+func TestOPTIONS(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		return c.Empty()
+	}
+	app := goweb.New()
+	corsConfig := goweb.CorsConfig{
+		MaxAge:  3600,
+		Headers: "*",
+		Origin:  "*",
+	}
+	app.AutoCors(&corsConfig)
+	app.GET("/foo", handler)
+	app.PATCH("/foo", handler)
+	app.PUT("/foo", handler)
+	app.POST("/foo", handler)
+	app.HEAD("/foo", handler)
+	app.DELETE("/foo", handler)
+	req, err := http.NewRequest("OPTIONS", "/foo", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	app.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", rr.Code, http.StatusOK)
+	}
+	header := rr.Header()
+	if header.Get("Access-Control-Allow-Origin") != corsConfig.Origin {
+		t.Errorf("handler returned unexpected Access-Control-Allow-Origin header: got '%v' want '%v'", header.Get("Access-Control-Allow-Origin"), corsConfig.Origin)
+	}
+	allowedMethods := header.Get("Access-Control-Allow-Methods")
+	if !strings.Contains(allowedMethods, http.MethodGet) ||
+		!strings.Contains(allowedMethods, http.MethodDelete) ||
+		!strings.Contains(allowedMethods, http.MethodHead) ||
+		!strings.Contains(allowedMethods, http.MethodPatch) ||
+		!strings.Contains(allowedMethods, http.MethodPut) ||
+		!strings.Contains(allowedMethods, http.MethodPost) {
+		t.Errorf("handler returned unexpected Access-Control-Allow-Methods header: got '%v' want '%v'", header.Get("Access-Control-Allow-Methods"), "all methods")
+	}
+	if header.Get("Access-Control-Allow-Headers") != corsConfig.Headers {
+		t.Errorf("handler returned unexpected Access-Control-Allow-Headers header: got '%v' want '%v'", header.Get("Access-Control-Allow-Headers"), corsConfig.Headers)
+	}
+	if header.Get("Access-Control-Max-Age") != strconv.Itoa(corsConfig.MaxAge) {
+		t.Errorf("handler returned unexpected Access-Control-Max-Age header: got '%v' want '%v'", header.Get("Access-Control-Max-Age"), corsConfig.MaxAge)
+	}
 }
 
 func TestPostParamRoute(t *testing.T) {
