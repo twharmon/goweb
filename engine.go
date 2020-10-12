@@ -112,14 +112,15 @@ func (e *Engine) NotFound(handler Handler) {
 	e.notFoundHandler = handler
 }
 
-// CorsConfig .
+// CorsConfig holds CORS information.
 type CorsConfig struct {
 	Origin  string
 	Headers []string
 	MaxAge  time.Duration
 }
 
-// AutoCors .
+// AutoCors automatically set CORS related headers for incoming
+// requests.
 func (e *Engine) AutoCors(config *CorsConfig) {
 	e.corsConfig = config
 }

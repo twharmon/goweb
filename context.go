@@ -192,3 +192,12 @@ func (c *Context) Empty() *EmptyResponse {
 		context: c,
 	}
 }
+
+// Redirect redirects the request.
+func (c *Context) Redirect(url string, code int) *RedirectResponse {
+	return &RedirectResponse{
+		context: c,
+		code:    code,
+		url:     url,
+	}
+}

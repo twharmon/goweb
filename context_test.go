@@ -266,3 +266,22 @@ func TestLogEmergency(t *testing.T) {
 	app.GET("/", handler)
 	assertLog(t, app, "GET", "/", l, logMsg)
 }
+
+func TestRedirect(t *testing.T) {
+	app := goweb.New()
+	app.GET("/", func(c *goweb.Context) goweb.Responder {
+		return c.Redirect("/foo", http.StatusTemporaryRedirect)
+	})
+	req, err := http.NewRequest("GET", "/", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	app.ServeHTTP(rr, req)
+	if rr.Result().StatusCode != http.StatusTemporaryRedirect {
+		t.Errorf("handler returned unexpected status code: got '%v' want '%v'", rr.Result().StatusCode, http.StatusTemporaryRedirect)
+	}
+	if rr.Result().Header.Get("Location") != "/foo" {
+		t.Errorf("handler returned unexpected location header: got '%v' want '%v'", rr.Result().Header.Get("Location"), "/foo")
+	}
+}

@@ -2,6 +2,7 @@ package goweb
 
 import (
 	"encoding/json"
+	"net/http"
 )
 
 const (
@@ -27,6 +28,13 @@ type EmptyResponse struct {
 	context *Context
 }
 
+// RedirectResponse implements Responder interface.
+type RedirectResponse struct {
+	context *Context
+	url     string
+	code    int
+}
+
 // Responder is the Responder interface that responds to
 // HTTP requests.
 type Responder interface {
@@ -50,4 +58,9 @@ func (r *TextResponse) Respond() {
 	r.context.ResponseWriter.Header().Set(contentTypeHeader, contentTypeTextPlain)
 	r.context.ResponseWriter.WriteHeader(r.context.status)
 	r.context.ResponseWriter.Write([]byte(r.body))
+}
+
+// Respond sends a plain text response.
+func (r *RedirectResponse) Respond() {
+	http.Redirect(r.context.ResponseWriter, r.context.Request, r.url, r.code)
 }
