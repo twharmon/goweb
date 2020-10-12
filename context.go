@@ -186,14 +186,6 @@ func (c *Context) Text(text string) *TextResponse {
 	}
 }
 
-// File serves a file.
-func (c *Context) File(path string) *FileResponse {
-	return &FileResponse{
-		context: c,
-		path:    path,
-	}
-}
-
 // Empty returns a EmptyResponse.
 func (c *Context) Empty() *EmptyResponse {
 	return &EmptyResponse{
