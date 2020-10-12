@@ -51,5 +51,5 @@ func hello(c *goweb.Context) goweb.Responder {
 }
 
 func getUser(c *goweb.Context) goweb.Responder {
-	return c.JSON(c.Get("user").(*User))
+	return c.JSON(c.Get("user"))
 }

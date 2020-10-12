@@ -1,10 +1,8 @@
 package goweb_test
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
@@ -123,20 +121,6 @@ func TestJSON(t *testing.T) {
 	app.GET("/", handler)
 	resBody := "{\"hello\":\"world\"}\n"
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, resBody)
-}
-
-func TestFile(t *testing.T) {
-	content := "test file contents"
-	data := []byte(content)
-	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
-		t.Error(err)
-	}
-	app := goweb.New()
-	app.GET("/", func(c *goweb.Context) goweb.Responder {
-		return c.File("test.txt")
-	})
-	assert(t, app, "GET", "/", nil, nil, http.StatusOK, content)
-	os.Remove("./test.txt")
 }
 
 func TestParseJSON(t *testing.T) {

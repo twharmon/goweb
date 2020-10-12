@@ -2,16 +2,31 @@ package goweb_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/twharmon/goweb"
 )
+
+func TestRun(t *testing.T) {
+	app := goweb.New()
+	app.GET("/", func(c *goweb.Context) goweb.Responder {
+		return c.Empty()
+	})
+	go app.Run(":9999")
+	res, err := http.DefaultClient.Get("http://localhost:9999/")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("expected 200; got %d", res.StatusCode)
+	}
+	app.Shutdown()
+}
 
 func TestGET(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
@@ -73,8 +88,8 @@ func TestOPTIONS(t *testing.T) {
 	}
 	app := goweb.New()
 	corsConfig := goweb.CorsConfig{
-		MaxAge:  3600,
-		Headers: "*",
+		MaxAge:  time.Hour,
+		Headers: []string{"*"},
 		Origin:  "*",
 	}
 	app.AutoCors(&corsConfig)
@@ -106,10 +121,10 @@ func TestOPTIONS(t *testing.T) {
 		!strings.Contains(allowedMethods, http.MethodPost) {
 		t.Errorf("handler returned unexpected Access-Control-Allow-Methods header: got '%v' want '%v'", header.Get("Access-Control-Allow-Methods"), "all methods")
 	}
-	if header.Get("Access-Control-Allow-Headers") != corsConfig.Headers {
+	if header.Get("Access-Control-Allow-Headers") != strings.Join(corsConfig.Headers, ", ") {
 		t.Errorf("handler returned unexpected Access-Control-Allow-Headers header: got '%v' want '%v'", header.Get("Access-Control-Allow-Headers"), corsConfig.Headers)
 	}
-	if header.Get("Access-Control-Max-Age") != strconv.Itoa(corsConfig.MaxAge) {
+	if header.Get("Access-Control-Max-Age") != "3600" {
 		t.Errorf("handler returned unexpected Access-Control-Max-Age header: got '%v' want '%v'", header.Get("Access-Control-Max-Age"), corsConfig.MaxAge)
 	}
 }
@@ -136,59 +151,6 @@ func TestMultiParamRoute(t *testing.T) {
 	assert(t, app, "GET", "/a/b/c/d", nil, nil, http.StatusOK, "")
 }
 
-func TestServeFiles(t *testing.T) {
-	content := "test file contents"
-	data := []byte(content)
-	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
-		t.Error(err)
-	}
-	app := goweb.New()
-	app.ServeFiles("/", ".")
-	assert(t, app, "GET", "/test.txt", nil, nil, http.StatusOK, content)
-	os.Remove("./test.txt")
-}
-
-func TestServeFilesIndex(t *testing.T) {
-	content := "<html>hello world</html>"
-	data := []byte(content)
-	if err := ioutil.WriteFile("./index.html", data, 0700); err != nil {
-		t.Error(err)
-	}
-	app := goweb.New()
-	app.ServeFiles("/", ".")
-	assert(t, app, "GET", "/", nil, nil, http.StatusOK, content)
-	os.Remove("./index.html")
-}
-
-func TestGzipAndServeFiles(t *testing.T) {
-	content := "test file contents"
-	data := []byte(content)
-	if err := ioutil.WriteFile("./test.txt", data, 0700); err != nil {
-		t.Error(err)
-	}
-	app := goweb.New()
-	app.GzipAndServeFiles("/", ".", 10)
-	assertOK(t, app, "GET", "/test.txt", nil, nil, http.StatusOK)
-	os.Remove("./test.txt")
-	os.Remove("./test.txt.gz")
-}
-
-func TestGzipAndServeFilesIndex(t *testing.T) {
-	content := "<html>hello world</html>"
-	data := []byte(content)
-	if err := ioutil.WriteFile("./index.html", data, 0700); err != nil {
-		t.Error(err)
-	}
-	app := goweb.New()
-	app.GzipAndServeFiles("/", ".", 10)
-	transformer := func(r *http.Request) {
-		r.Header.Set("Accept-Encoding", "gzip")
-	}
-	assertOK(t, app, "GET", "/", nil, transformer, http.StatusOK)
-	os.Remove("./index.html")
-	os.Remove("./index.html.gz")
-}
-
 func TestRouteNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
@@ -196,6 +158,15 @@ func TestRouteNotFound(t *testing.T) {
 	app := goweb.New()
 	app.GET("/", handler)
 	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "Page not found")
+}
+
+func TestCORSRouteNotFound(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		return c.Empty()
+	}
+	app := goweb.New()
+	app.GET("/", handler)
+	assert(t, app, http.MethodOptions, "/foo", nil, nil, http.StatusNotFound, "")
 }
 
 func TestCustomNotFound(t *testing.T) {

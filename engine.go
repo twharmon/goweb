@@ -7,19 +7,19 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Engine contains routing and logging information for your
 // app.
 type Engine struct {
-	server        *http.Server
-	getRoutes     []*route
-	putRoutes     []*route
-	postRoutes    []*route
-	patchRoutes   []*route
-	deleteRoutes  []*route
-	optionsRoutes []*route
-	headRoutes    []*route
+	server       *http.Server
+	getRoutes    []*route
+	putRoutes    []*route
+	postRoutes   []*route
+	patchRoutes  []*route
+	deleteRoutes []*route
+	headRoutes   []*route
 
 	notFoundHandler Handler
 	corsConfig      *CorsConfig
@@ -106,43 +106,6 @@ func (e *Engine) Middleware(middleware ...Handler) *Middleware {
 	}
 }
 
-// ServeFiles will serve files from the given directory
-// with the given path.
-func (e *Engine) ServeFiles(path string, directory string) {
-	e.registerRoute(http.MethodGet, path+"{name:.+}", func(c *Context) Responder {
-		return &FileResponse{
-			path:    directory + "/" + c.Param("name"),
-			context: c,
-		}
-	})
-	e.registerRoute(http.MethodGet, path, func(c *Context) Responder {
-		return &FileResponse{
-			path:    directory + "/index.html",
-			context: c,
-		}
-	})
-}
-
-// GzipAndServeFiles will serve files from the given directory
-// with the given path. If the file size is greater than the given
-// size, a gzipped version of the file will be created and served.
-func (e *Engine) GzipAndServeFiles(path string, directory string, size int64) {
-	e.registerRoute(http.MethodGet, path+"{name:.+}", func(c *Context) Responder {
-		return &FileResponse{
-			path:    directory + "/" + c.Param("name"),
-			context: c,
-			gzip:    size,
-		}
-	})
-	e.registerRoute(http.MethodGet, path, func(c *Context) Responder {
-		return &FileResponse{
-			path:    directory + "/index.html",
-			context: c,
-			gzip:    size,
-		}
-	})
-}
-
 // NotFound registers a handler to be called if no route is
 // matched.
 func (e *Engine) NotFound(handler Handler) {
@@ -152,8 +115,8 @@ func (e *Engine) NotFound(handler Handler) {
 // CorsConfig .
 type CorsConfig struct {
 	Origin  string
-	Headers string
-	MaxAge  int
+	Headers []string
+	MaxAge  time.Duration
 }
 
 // AutoCors .
@@ -186,8 +149,8 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h := w.Header()
-		h.Set("Access-Control-Allow-Headers", e.corsConfig.Headers)
-		h.Set("Access-Control-Max-Age", strconv.Itoa(e.corsConfig.MaxAge))
+		h.Set("Access-Control-Allow-Headers", strings.Join(e.corsConfig.Headers, ", "))
+		h.Set("Access-Control-Max-Age", strconv.Itoa(int(e.corsConfig.MaxAge.Seconds())))
 
 		var methods []string
 		for _, rt := range e.getRoutes {
