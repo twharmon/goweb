@@ -157,7 +157,7 @@ func TestRouteNotFound(t *testing.T) {
 	}
 	app := goweb.New()
 	app.GET("/", handler)
-	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "Page not found")
+	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "{\"message\":\"Page Not Found\"}")
 }
 
 func TestCORSRouteNotFound(t *testing.T) {
