@@ -48,7 +48,7 @@ func assert(t *testing.T, app *goweb.Engine, method string, path string, reqBody
 	if rr.Code != status {
 		t.Errorf("handler returned wrong status code: got %v want %v", rr.Code, status)
 	}
-	if rr.Body.String() != resBody {
+	if strings.TrimSpace(rr.Body.String()) != strings.TrimSpace(resBody) {
 		t.Errorf("handler returned unexpected body: got '%v' want '%v'", rr.Body.String(), resBody)
 	}
 }

@@ -8,6 +8,7 @@ Includes
 - routing
 - middleware
 - logging
+- auto TLS (https)
 - easy CORS
 
 Goweb aims to

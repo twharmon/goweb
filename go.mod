@@ -8,4 +8,5 @@ require (
 	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab
 	github.com/gorilla/mux v1.8.0
 	github.com/labstack/echo/v4 v4.1.17
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 )

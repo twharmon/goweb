@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/acme/autocert"
 )
 
 // Engine contains routing and logging information for your
@@ -230,6 +232,34 @@ func (e *Engine) Run(port string) error {
 		Handler: e,
 	}
 	return e.server.ListenAndServe()
+}
+
+// RunTLS starts a server on port :443.
+func (e *Engine) RunTLS(config *TLSConfig) error {
+	if config.Cache == nil {
+		config.Cache = autocert.DirCache("certs")
+	}
+	m := &autocert.Manager{
+		Cache:  config.Cache,
+		Prompt: autocert.AcceptTOS,
+		HostPolicy: func(_ context.Context, host string) error {
+			return config.HostPolicy(host)
+		},
+	}
+	if !config.AllowHTTP {
+		go http.ListenAndServe(":http", m.HTTPHandler(nil))
+	}
+	e.server = &http.Server{
+		Addr:      ":https",
+		TLSConfig: m.TLSConfig(),
+		Handler:   e,
+	}
+	return e.server.ListenAndServeTLS("", "")
+}
+
+// DirCache creates a cache for Let's Encrypt certificates.
+func DirCache(dir string) autocert.Cache {
+	return autocert.DirCache(dir)
 }
 
 // RegisterLogger registers a logger.
