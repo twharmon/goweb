@@ -6,7 +6,7 @@ import (
 )
 
 // Resource creates multiple REST handlers from given interface.
-func (e *Engine) Resource(resourceName string, resource iResource) {
+func (e *Engine) Resource(resourceName string, resource Resource) {
 	resourcePath := fmt.Sprintf("/%s/{%s}", resourceName, resource.Identifier())
 	e.registerRoute(http.MethodGet, resourceName, resource.Index)
 	e.registerRoute(http.MethodGet, resourcePath, resource.Get)
@@ -15,7 +15,8 @@ func (e *Engine) Resource(resourceName string, resource iResource) {
 	e.registerRoute(http.MethodPost, resourceName, resource.Post)
 }
 
-type iResource interface {
+// Resource handles Index, Get, Put, Delete, and Post requests.
+type Resource interface {
 	Index(c *Context) Responder
 	Get(c *Context) Responder
 	Put(c *Context) Responder
