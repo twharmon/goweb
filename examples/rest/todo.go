@@ -2,52 +2,64 @@ package main
 
 import (
 	"fmt"
-	"github.com/twharmon/goweb"
 	"strconv"
+
+	"github.com/twharmon/goweb"
 )
 
+// Todo represents a todo item.
 type Todo struct {
 	Text string
 }
-type todoResource struct {
+
+// TodoResource implements the resource interface.
+type TodoResource struct {
 	Todos   map[string]Todo
 	counter int
 }
 
-func New() todoResource {
-	return todoResource{
+// New returns a new todo resource instance.
+func New() *TodoResource {
+	return &TodoResource{
 		Todos:   make(map[string]Todo),
 		counter: 0,
 	}
 }
-func (t todoResource) Index(c *goweb.Context) goweb.Responder {
+
+// Index returns a list of todos.
+func (t *TodoResource) Index(c *goweb.Context) goweb.Responder {
 	fmt.Println(t.Todos)
 	return c.JSON(t.Todos)
 }
 
-func (t todoResource) Get(c *goweb.Context) goweb.Responder {
+// Get returns one todo.
+func (t *TodoResource) Get(c *goweb.Context) goweb.Responder {
 	id := c.Param(t.Identifier())
 	return c.JSON(t.Todos[id])
 }
 
-func (t *todoResource) Put(c *goweb.Context) goweb.Responder {
+// Put updates a todo.
+func (t *TodoResource) Put(c *goweb.Context) goweb.Responder {
 	id := c.Param(t.Identifier())
 	t.Todos[id] = Todo{"put called"}
 	return c.JSON(t.Todos[id])
 }
 
-func (t *todoResource) Delete(c *goweb.Context) goweb.Responder {
+// Delete removes a todo.
+func (t *TodoResource) Delete(c *goweb.Context) goweb.Responder {
 	delete(t.Todos, c.Param(t.Identifier()))
 	return c.JSON(len(t.Todos))
 }
 
-func (t *todoResource) Post(c *goweb.Context) goweb.Responder {
+// Post creates a new todo.
+func (t *TodoResource) Post(c *goweb.Context) goweb.Responder {
 	id := t.counter
 	t.counter++
 	t.Todos[strconv.Itoa(id)] = Todo{Text: "new from post"}
 	return c.JSON(id)
 }
 
-func (t todoResource) Identifier() string {
+// Identifier returns the identifying property.
+func (t *TodoResource) Identifier() string {
 	return "id"
 }
