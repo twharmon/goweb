@@ -1,5 +1,10 @@
 package goweb
 
+import (
+	"fmt"
+	"net/http"
+)
+
 // Middleware contains a set of Handler functions that will
 // be applied in the same order in which they were
 // registered.
@@ -55,4 +60,14 @@ func (m *Middleware) DELETE(path string, handler Handler) {
 // HEAD registers a route for method HEAD.
 func (m *Middleware) HEAD(path string, handler Handler) {
 	m.engine.HEAD(path, m.apply(handler))
+}
+
+// Resource creates multiple REST handlers from given interface.
+func (m *Middleware) Resource(resourceName string, resource Resource) {
+	resourcePath := fmt.Sprintf("%s/{%s}", resourceName, resource.Identifier())
+	m.engine.registerRoute(http.MethodGet, resourceName, resource.Index)
+	m.engine.registerRoute(http.MethodGet, resourcePath, resource.Get)
+	m.engine.registerRoute(http.MethodPut, resourcePath, resource.Put)
+	m.engine.registerRoute(http.MethodDelete, resourcePath, resource.Delete)
+	m.engine.registerRoute(http.MethodPost, resourceName, resource.Post)
 }

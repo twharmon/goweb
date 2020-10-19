@@ -46,3 +46,16 @@ func TestResource(t *testing.T) {
 	assert(t, app, "DELETE", "/todo/3", nil, nil, http.StatusOK, "3")
 	assert(t, app, "POST", "/todo", nil, nil, http.StatusOK, "4")
 }
+
+func TestResourceMiddleware(t *testing.T) {
+	app := goweb.New()
+
+	m := app.Middleware()
+	m.Resource("/todo", todoResource{})
+
+	assert(t, app, "GET", "/todo", nil, nil, http.StatusOK, "index")
+	assert(t, app, "GET", "/todo/1", nil, nil, http.StatusOK, "1")
+	assert(t, app, "PUT", "/todo/2", nil, nil, http.StatusOK, "2")
+	assert(t, app, "DELETE", "/todo/3", nil, nil, http.StatusOK, "3")
+	assert(t, app, "POST", "/todo", nil, nil, http.StatusOK, "4")
+}
