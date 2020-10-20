@@ -18,6 +18,8 @@ Goweb aims to
 
 ## Usage
 See [examples](https://github.com/twharmon/goweb/tree/master/examples).
+
+### Basic usage
 ```go
 package main
 
@@ -37,6 +39,9 @@ func hello(c *goweb.Context) goweb.Responder {
     })
 }
 ```
+
+### Easily extendable
+See [serving files](https://github.com/twharmon/goweb/tree/master/examples/files) or [template rendering](https://github.com/twharmon/goweb/tree/master/examples/templates) for examples.
 
 ## Documentation
 For full documentation see [pkg.go.dev](https://pkg.go.dev/github.com/twharmon/goweb).
