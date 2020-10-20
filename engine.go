@@ -145,54 +145,58 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodHead:
 		e.serve(w, r, e.headRoutes)
 	case http.MethodOptions:
-		if e.corsConfig == nil {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-		h := w.Header()
-		h.Set("Access-Control-Allow-Headers", strings.Join(e.corsConfig.Headers, ", "))
-		h.Set("Access-Control-Max-Age", strconv.Itoa(int(e.corsConfig.MaxAge.Seconds())))
-
-		var methods []string
-		for _, rt := range e.getRoutes {
-			if rt.regexp.MatchString(r.URL.Path) {
-				methods = append(methods, http.MethodGet)
-				break
-			}
-		}
-		for _, rt := range e.putRoutes {
-			if rt.regexp.MatchString(r.URL.Path) {
-				methods = append(methods, http.MethodPut)
-				break
-			}
-		}
-		for _, rt := range e.patchRoutes {
-			if rt.regexp.MatchString(r.URL.Path) {
-				methods = append(methods, http.MethodPatch)
-				break
-			}
-		}
-		for _, rt := range e.postRoutes {
-			if rt.regexp.MatchString(r.URL.Path) {
-				methods = append(methods, http.MethodPost)
-				break
-			}
-		}
-		for _, rt := range e.deleteRoutes {
-			if rt.regexp.MatchString(r.URL.Path) {
-				methods = append(methods, http.MethodDelete)
-				break
-			}
-		}
-		for _, rt := range e.headRoutes {
-			if rt.regexp.MatchString(r.URL.Path) {
-				methods = append(methods, http.MethodHead)
-				break
-			}
-		}
-		h.Set("Access-Control-Allow-Methods", strings.Join(methods, ", "))
-		w.WriteHeader(http.StatusOK)
+		e.serveOptions(w, r)
 	}
+}
+
+func (e *Engine) serveOptions(w http.ResponseWriter, r *http.Request) {
+	if e.corsConfig == nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	h := w.Header()
+	h.Set("Access-Control-Allow-Headers", strings.Join(e.corsConfig.Headers, ", "))
+	h.Set("Access-Control-Max-Age", strconv.Itoa(int(e.corsConfig.MaxAge.Seconds())))
+
+	var methods []string
+	for _, rt := range e.getRoutes {
+		if rt.regexp.MatchString(r.URL.Path) {
+			methods = append(methods, http.MethodGet)
+			break
+		}
+	}
+	for _, rt := range e.putRoutes {
+		if rt.regexp.MatchString(r.URL.Path) {
+			methods = append(methods, http.MethodPut)
+			break
+		}
+	}
+	for _, rt := range e.patchRoutes {
+		if rt.regexp.MatchString(r.URL.Path) {
+			methods = append(methods, http.MethodPatch)
+			break
+		}
+	}
+	for _, rt := range e.postRoutes {
+		if rt.regexp.MatchString(r.URL.Path) {
+			methods = append(methods, http.MethodPost)
+			break
+		}
+	}
+	for _, rt := range e.deleteRoutes {
+		if rt.regexp.MatchString(r.URL.Path) {
+			methods = append(methods, http.MethodDelete)
+			break
+		}
+	}
+	for _, rt := range e.headRoutes {
+		if rt.regexp.MatchString(r.URL.Path) {
+			methods = append(methods, http.MethodHead)
+			break
+		}
+	}
+	h.Set("Access-Control-Allow-Methods", strings.Join(methods, ", "))
+	w.WriteHeader(http.StatusOK)
 }
 
 func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) {
