@@ -65,9 +65,9 @@ func (m *Middleware) HEAD(path string, handler Handler) {
 // Resource creates multiple REST handlers from given interface.
 func (m *Middleware) Resource(resourceName string, resource Resource) {
 	resourcePath := fmt.Sprintf("%s/{%s}", resourceName, resource.Identifier())
-	m.engine.registerRoute(http.MethodGet, resourceName, resource.Index)
-	m.engine.registerRoute(http.MethodGet, resourcePath, resource.Get)
-	m.engine.registerRoute(http.MethodPut, resourcePath, resource.Put)
-	m.engine.registerRoute(http.MethodDelete, resourcePath, resource.Delete)
-	m.engine.registerRoute(http.MethodPost, resourceName, resource.Post)
+	m.engine.registerRoute(http.MethodGet, resourceName, m.apply(resource.Index))
+	m.engine.registerRoute(http.MethodGet, resourcePath, m.apply(resource.Get))
+	m.engine.registerRoute(http.MethodPut, resourcePath, m.apply(resource.Put))
+	m.engine.registerRoute(http.MethodDelete, resourcePath, m.apply(resource.Delete))
+	m.engine.registerRoute(http.MethodPost, resourceName, m.apply(resource.Post))
 }
