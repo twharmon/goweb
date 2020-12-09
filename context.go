@@ -193,6 +193,11 @@ func (c *Context) Empty() *EmptyResponse {
 	}
 }
 
+// Nil does not return any response.
+func (c *Context) Nil() *NilResponse {
+	return &NilResponse{}
+}
+
 // Redirect redirects the request.
 func (c *Context) Redirect(url string, code int) *RedirectResponse {
 	return &RedirectResponse{
