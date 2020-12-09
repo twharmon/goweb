@@ -23,9 +23,16 @@ type TextResponse struct {
 	body    string
 }
 
-// EmptyResponse implements Responder interface.
+// EmptyResponse implements Responder interface. It sends
+// as response without a body.
 type EmptyResponse struct {
 	context *Context
+}
+
+// NilResponse implements Responder interface. It does
+// not send any response. Useful for handlers that upgrade
+// to WebSockets.
+type NilResponse struct {
 }
 
 // RedirectResponse implements Responder interface.
@@ -52,6 +59,9 @@ func (r *JSONResponse) Respond() {
 func (r *EmptyResponse) Respond() {
 	r.context.ResponseWriter.WriteHeader(r.context.status)
 }
+
+// Respond does not do anything.
+func (r *NilResponse) Respond() {}
 
 // Respond sends a plain text response.
 func (r *TextResponse) Respond() {
