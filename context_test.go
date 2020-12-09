@@ -18,6 +18,15 @@ func TestOKEmpty(t *testing.T) {
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
 
+func TestNil(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		return c.Nil()
+	}
+	app := goweb.New()
+	app.GET("/", handler)
+	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
+}
+
 func TestStatus(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Status(http.StatusTeapot).Empty()
