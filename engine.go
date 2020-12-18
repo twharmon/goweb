@@ -209,6 +209,12 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 		loggers:        e.loggers,
 		status:         http.StatusOK,
 	}
+	if e.corsConfig != nil {
+		c.ResponseWriter.Header().Set("Access-Control-Allow-Origin", e.corsConfig.Origin)
+		if e.corsConfig.AllowCredentials {
+			c.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
+	}
 	for _, route := range routes {
 		if route.regexp.MatchString(r.URL.Path) {
 			c.store = make(Map)
