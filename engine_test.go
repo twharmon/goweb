@@ -88,9 +88,10 @@ func TestOPTIONS(t *testing.T) {
 	}
 	app := goweb.New()
 	corsConfig := goweb.CorsConfig{
-		MaxAge:  time.Hour,
-		Headers: []string{"*"},
-		Origin:  "*",
+		MaxAge:           time.Hour,
+		Headers:          []string{"*"},
+		Origin:           "*",
+		AllowCredentials: true,
 	}
 	app.AutoCors(&corsConfig)
 	app.GET("/foo", handler)
