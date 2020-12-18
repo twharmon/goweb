@@ -114,9 +114,10 @@ func (e *Engine) NotFound(handler Handler) {
 
 // CorsConfig holds CORS information.
 type CorsConfig struct {
-	Origin  string
-	Headers []string
-	MaxAge  time.Duration
+	Origin           string
+	Headers          []string
+	MaxAge           time.Duration
+	AllowCredentials bool
 }
 
 // AutoCors automatically set CORS related headers for incoming
@@ -157,7 +158,9 @@ func (e *Engine) serveOptions(w http.ResponseWriter, r *http.Request) {
 	h := w.Header()
 	h.Set("Access-Control-Allow-Headers", strings.Join(e.corsConfig.Headers, ", "))
 	h.Set("Access-Control-Max-Age", strconv.Itoa(int(e.corsConfig.MaxAge.Seconds())))
-
+	if e.corsConfig.AllowCredentials {
+		h.Set("Access-Control-Allow-Credentials", "true")
+	}
 	var methods []string
 	for _, rt := range e.getRoutes {
 		if rt.regexp.MatchString(r.URL.Path) {
