@@ -28,6 +28,22 @@ func TestRun(t *testing.T) {
 	app.Shutdown()
 }
 
+func TestCORSHeaders(t *testing.T) {
+	handler := func(c *goweb.Context) goweb.Responder {
+		return c.Empty()
+	}
+	app := goweb.New()
+	corsConfig := goweb.CorsConfig{
+		MaxAge:           time.Hour,
+		Headers:          []string{"*"},
+		Origin:           "*",
+		AllowCredentials: true,
+	}
+	app.AutoCors(&corsConfig)
+	app.GET("/", handler)
+	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
+}
+
 func TestGET(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		return c.Empty()
