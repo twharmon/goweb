@@ -8,7 +8,6 @@ Includes
 - routing
 - middleware
 - logging
-- easy CORS (experimental)
 
 Goweb aims to
 1. rely only on the standard library as much as possible
