@@ -5,24 +5,21 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"strconv"
-	"strings"
-	"time"
 )
 
 // Engine contains routing and logging information for your
 // app.
 type Engine struct {
-	server       *http.Server
-	getRoutes    []*route
-	putRoutes    []*route
-	postRoutes   []*route
-	patchRoutes  []*route
-	deleteRoutes []*route
-	headRoutes   []*route
+	server        *http.Server
+	getRoutes     []*route
+	putRoutes     []*route
+	postRoutes    []*route
+	patchRoutes   []*route
+	deleteRoutes  []*route
+	headRoutes    []*route
+	optionsRoutes []*route
 
 	notFoundHandler Handler
-	corsConfig      *CorsConfig
 
 	loggers []Logger
 }
@@ -46,6 +43,8 @@ func (e *Engine) registerRoute(method string, path string, handler Handler) {
 		e.deleteRoutes = append(e.deleteRoutes, rt)
 	case http.MethodHead:
 		e.headRoutes = append(e.headRoutes, rt)
+	case http.MethodOptions:
+		e.optionsRoutes = append(e.optionsRoutes, rt)
 	}
 }
 
@@ -98,6 +97,11 @@ func (e *Engine) HEAD(path string, handler Handler) {
 	e.registerRoute(http.MethodHead, path, handler)
 }
 
+// OPTIONS registers a route for method OPTIONS.
+func (e *Engine) OPTIONS(path string, handler Handler) {
+	e.registerRoute(http.MethodOptions, path, handler)
+}
+
 // Middleware returns a new middleware chain.
 func (e *Engine) Middleware(middleware ...Handler) *Middleware {
 	return &Middleware{
@@ -112,26 +116,8 @@ func (e *Engine) NotFound(handler Handler) {
 	e.notFoundHandler = handler
 }
 
-// CorsConfig holds CORS information.
-type CorsConfig struct {
-	Origin           string
-	Headers          []string
-	MaxAge           time.Duration
-	AllowCredentials bool
-}
-
-// AutoCors automatically set CORS related headers for incoming
-// requests.
-func (e *Engine) AutoCors(config *CorsConfig) {
-	e.corsConfig = config
-}
-
 // ServeHTTP implements the http.Handler interface.
 func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if e.corsConfig != nil {
-		h := w.Header()
-		h.Set("Access-Control-Allow-Origin", e.corsConfig.Origin)
-	}
 	switch r.Method {
 	case http.MethodGet:
 		e.serve(w, r, e.getRoutes)
@@ -146,60 +132,8 @@ func (e *Engine) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodHead:
 		e.serve(w, r, e.headRoutes)
 	case http.MethodOptions:
-		e.serveOptions(w, r)
+		e.serve(w, r, e.optionsRoutes)
 	}
-}
-
-func (e *Engine) serveOptions(w http.ResponseWriter, r *http.Request) {
-	if e.corsConfig == nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-	h := w.Header()
-	h.Set("Access-Control-Allow-Headers", strings.Join(e.corsConfig.Headers, ", "))
-	h.Set("Access-Control-Max-Age", strconv.Itoa(int(e.corsConfig.MaxAge.Seconds())))
-	if e.corsConfig.AllowCredentials {
-		h.Set("Access-Control-Allow-Credentials", "true")
-	}
-	var methods []string
-	for _, rt := range e.getRoutes {
-		if rt.regexp.MatchString(r.URL.Path) {
-			methods = append(methods, http.MethodGet)
-			break
-		}
-	}
-	for _, rt := range e.putRoutes {
-		if rt.regexp.MatchString(r.URL.Path) {
-			methods = append(methods, http.MethodPut)
-			break
-		}
-	}
-	for _, rt := range e.patchRoutes {
-		if rt.regexp.MatchString(r.URL.Path) {
-			methods = append(methods, http.MethodPatch)
-			break
-		}
-	}
-	for _, rt := range e.postRoutes {
-		if rt.regexp.MatchString(r.URL.Path) {
-			methods = append(methods, http.MethodPost)
-			break
-		}
-	}
-	for _, rt := range e.deleteRoutes {
-		if rt.regexp.MatchString(r.URL.Path) {
-			methods = append(methods, http.MethodDelete)
-			break
-		}
-	}
-	for _, rt := range e.headRoutes {
-		if rt.regexp.MatchString(r.URL.Path) {
-			methods = append(methods, http.MethodHead)
-			break
-		}
-	}
-	h.Set("Access-Control-Allow-Methods", strings.Join(methods, ", "))
-	w.WriteHeader(http.StatusOK)
 }
 
 func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) {
@@ -208,12 +142,6 @@ func (e *Engine) serve(w http.ResponseWriter, r *http.Request, routes []*route) 
 		Request:        r,
 		loggers:        e.loggers,
 		status:         http.StatusOK,
-	}
-	if e.corsConfig != nil {
-		c.ResponseWriter.Header().Set("Access-Control-Allow-Origin", e.corsConfig.Origin)
-		if e.corsConfig.AllowCredentials {
-			c.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-		}
 	}
 	for _, route := range routes {
 		if route.regexp.MatchString(r.URL.Path) {
