@@ -17,7 +17,7 @@ func main() {
 		})
 	})
 
-	app.Run(":8080")
+	app.Run("localhost:8080")
 }
 
 func newTemplateResponse(c *goweb.Context, path string, data goweb.Map) *templateResponse {

@@ -24,5 +24,5 @@ func main() {
 		})
 	})
 
-	app.Run(":8080")
+	app.Run("localhost:8080")
 }

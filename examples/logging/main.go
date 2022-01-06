@@ -15,7 +15,7 @@ func main() {
 
 	app.GET("/divide/{a}/by/{b}", divide)
 
-	app.Run(":8080")
+	app.Run("localhost:8080")
 }
 
 func divide(c *goweb.Context) goweb.Responder {

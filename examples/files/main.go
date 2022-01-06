@@ -20,7 +20,7 @@ func main() {
 		return newFileResponse(c, strings.TrimRight(path, "/"))
 	})
 
-	app.Run(":8080")
+	app.Run("localhost:8080")
 }
 
 func newFileResponse(c *goweb.Context, path string) *fileResponse {

@@ -28,7 +28,7 @@ import (
 func main() {
     app := goweb.New()
     app.GET("/hello/{name}", hello)
-    app.Run(":8080")
+    app.Run("localhost:8080")
 }
 
 func hello(c *goweb.Context) goweb.Responder {

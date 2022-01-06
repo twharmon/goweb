@@ -20,7 +20,7 @@ func main() {
 	app.GET("/", hello)
 	auth.GET("/user/{name}", getUser)
 
-	app.Run(":8080")
+	app.Run("localhost:8080")
 }
 
 func isAuthUser(c *goweb.Context) goweb.Responder {

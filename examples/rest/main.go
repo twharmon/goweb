@@ -8,5 +8,5 @@ func main() {
 	app := goweb.New()
 	t := New()
 	app.Resource("/todos", t)
-	app.Run(":8080")
+	app.Run("localhost:8080")
 }
