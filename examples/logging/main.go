@@ -11,7 +11,7 @@ import (
 func main() {
 	app := goweb.New()
 
-	app.RegisterLogger(&myLogger{})
+	app.RegisterLogger(newLogger(goweb.LogLevelInfo))
 
 	app.GET("/divide/{a}/by/{b}", divide)
 
@@ -38,10 +38,19 @@ func divide(c *goweb.Context) goweb.Responder {
 	return c.Text(fmt.Sprintf("%f", a/b))
 }
 
-type myLogger struct{}
+type logger struct {
+	level goweb.LogLevel
+}
 
-func (l *myLogger) Log(_ *goweb.Context, logLevel goweb.LogLevel, messages ...interface{}) {
-	prefix := fmt.Sprintf("[%s]", logLevel)
+func newLogger(level goweb.LogLevel) goweb.Logger {
+	return &logger{level: level}
+}
+
+func (l *logger) Log(c *goweb.Context, logLevel goweb.LogLevel, messages ...interface{}) {
+	if l.level > logLevel {
+		return
+	}
+	prefix := fmt.Sprintf("[%s] %s", logLevel, c.Request.URL.Path)
 	messages = append([]interface{}{prefix}, messages...)
 	log.Println(messages...)
 }
