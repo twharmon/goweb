@@ -17,7 +17,7 @@ Goweb aims to
 ## Usage
 See [examples](https://github.com/twharmon/goweb/tree/master/examples).
 
-### Basic usage
+### Basic
 ```go
 package main
 
@@ -38,8 +38,94 @@ func hello(c *goweb.Context) goweb.Responder {
 }
 ```
 
+### Logging
+```go
+package main
+
+import (
+	"github.com/twharmon/goweb"
+)
+
+func main() {
+    app := goweb.New()
+	app.RegisterLogger(newLogger(goweb.LogLevelInfo))
+    app.GET("/hello/{name}", hello)
+    app.Run(":8080")
+}
+
+func hello(c *goweb.Context) goweb.Responder {
+    c.LogInfo("param name:", c.Param("name"))
+    // logs "[INFO] /hello/Gopher param name: Gopher"
+    return c.JSON(goweb.Map{
+        "hello": c.Param("name"),
+    })
+}
+
+type logger struct{
+	level goweb.LogLevel
+}
+
+func newLogger(level goweb.LogLevel) goweb.Logger {
+	return &logger{level: level}
+}
+
+func (l *logger) Log(c *goweb.Context, logLevel goweb.LogLevel, messages ...interface{}) {
+	if l.level > logLevel {
+		return
+	}
+	prefix := fmt.Sprintf("[%s] %s", logLevel, c.Request.URL.Path)
+	messages = append([]interface{}{prefix}, messages...)
+	log.Println(messages...)
+}
+```
+
+### Auto TLS
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"log"
+	"net/http"
+
+	"github.com/twharmon/goweb"
+	"golang.org/x/crypto/acme/autocert"
+)
+
+func main() {
+	app := goweb.New()
+	app.GET("/", func(c *goweb.Context) goweb.Responder {
+		return c.JSON(goweb.Map{
+			"hello": "world",
+		})
+	})
+	serveTLS(app)
+}
+
+func serveTLS(app *goweb.Engine) {
+	m := &autocert.Manager{
+		Cache:  autocert.DirCache(".certs"),
+		Prompt: autocert.AcceptTOS,
+		HostPolicy: func(_ context.Context, host string) error {
+			if host == "example.com" {
+				return nil
+			}
+			return errors.New("host not configured")
+		},
+	}
+	go http.ListenAndServe(":http", m.HTTPHandler(nil))
+	s := &http.Server{
+		Addr:      ":https",
+		TLSConfig: m.TLSConfig(),
+		Handler:   app,
+	}
+	log.Fatalln(s.ListenAndServeTLS("", ""))
+}
+```
+
 ### Easily extendable
-See [serving files](https://github.com/twharmon/goweb/tree/master/examples/files), [template rendering](https://github.com/twharmon/goweb/tree/master/examples/templates), and [tls](https://github.com/twharmon/goweb/tree/master/examples/tls) for examples.
+See [serving files](https://github.com/twharmon/goweb/tree/master/examples/files), [template rendering](https://github.com/twharmon/goweb/tree/master/examples/templates), [tls](https://github.com/twharmon/goweb/tree/master/examples/tls), and [logging](https://github.com/twharmon/goweb/tree/master/examples/logging) for examples.
 
 ## Documentation
 For full documentation see [pkg.go.dev](https://pkg.go.dev/github.com/twharmon/goweb).
