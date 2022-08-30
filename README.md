@@ -132,10 +132,6 @@ For full documentation see [pkg.go.dev](https://pkg.go.dev/github.com/twharmon/g
 
 ## Benchmarks
 ```
-goos: darwin
-goarch: arm64
-pkg: github.com/twharmon/goweb
-
 BenchmarkGinPlaintext-10         	 2706439	       440.0 ns/op	    1040 B/op	       9 allocs/op
 BenchmarkEchoPlaintext-10        	 2549317	       470.7 ns/op	    1024 B/op	      10 allocs/op
 BenchmarkGowebPlaintext-10       	 1584044	       756.6 ns/op	    1456 B/op	      16 allocs/op
