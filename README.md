@@ -32,7 +32,7 @@ func main() {
 }
 
 func hello(c *goweb.Context) goweb.Responder {
-    return c.JSON(goweb.Map{
+    return c.JSON(http.StatusOK, goweb.Map{
         "hello": c.Param("name"),
     })
 }
@@ -56,7 +56,7 @@ func main() {
 func hello(c *goweb.Context) goweb.Responder {
     c.LogInfo("param name:", c.Param("name"))
     // logs "[INFO] /hello/Gopher param name: Gopher"
-    return c.JSON(goweb.Map{
+    return c.JSON(http.StatusOK, goweb.Map{
         "hello": c.Param("name"),
     })
 }
