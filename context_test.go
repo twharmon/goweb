@@ -11,7 +11,7 @@ import (
 
 func TestOKEmpty(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/", handler)
@@ -27,90 +27,9 @@ func TestNil(t *testing.T) {
 	assert(t, app, "GET", "/", nil, nil, http.StatusOK, "")
 }
 
-func TestStatus(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Status(http.StatusTeapot).Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusTeapot, "")
-}
-
-func TestCreated(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Created().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusCreated, "")
-}
-
-func TestBadRequest(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.BadRequest().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusBadRequest, "")
-}
-
-func TestUnauthorized(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Unauthorized().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusUnauthorized, "")
-}
-
-func TestForbidden(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Forbidden().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusForbidden, "")
-}
-
-func TestNotFound(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.NotFound().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusNotFound, "")
-}
-
-func TestConflict(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Conflict().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusConflict, "")
-}
-
-func TestUnprocessableEntity(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.UnprocessableEntity().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusUnprocessableEntity, "")
-}
-
-func TestInternalServerError(t *testing.T) {
-	handler := func(c *goweb.Context) goweb.Responder {
-		return c.InternalServerError().Empty()
-	}
-	app := goweb.New()
-	app.GET("/", handler)
-	assert(t, app, "GET", "/", nil, nil, http.StatusInternalServerError, "")
-}
-
 func TestQuery(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Query("foo"))
+		return c.Text(http.StatusOK, c.Query("foo"))
 	}
 	app := goweb.New()
 	app.GET("/", handler)
@@ -122,7 +41,7 @@ func TestJSON(t *testing.T) {
 		Hello string `json:"hello"`
 	}
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.JSON(&Msg{
+		return c.JSON(http.StatusOK, &Msg{
 			Hello: "world",
 		})
 	}
@@ -140,9 +59,9 @@ func TestParseJSON(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		var msg Msg
 		if err := c.ParseJSON(&msg); err != nil {
-			return c.BadRequest().Empty()
+			return c.Empty(http.StatusBadRequest)
 		}
-		return c.JSON(&msg)
+		return c.JSON(http.StatusOK, &msg)
 	}
 	app := goweb.New()
 	app.POST("/", handler)
@@ -155,7 +74,7 @@ func TestSetCookie(t *testing.T) {
 			Name:  "foo",
 			Value: "bar",
 		})
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/", handler)
@@ -176,7 +95,7 @@ func TestLogDebug(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogDebug(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -189,7 +108,7 @@ func TestLogInfo(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogInfo(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -202,7 +121,7 @@ func TestLogNotice(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogNotice(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -215,7 +134,7 @@ func TestLogWarning(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogWarning(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -228,7 +147,7 @@ func TestLogError(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogError(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -241,7 +160,7 @@ func TestLogAlert(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogAlert(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -254,7 +173,7 @@ func TestLogCritical(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogCritical(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -267,7 +186,7 @@ func TestLogEmergency(t *testing.T) {
 	logMsg := "test log message"
 	handler := func(c *goweb.Context) goweb.Responder {
 		c.LogEmergency(logMsg)
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	l := newLogger()
 	app := goweb.New()
@@ -279,7 +198,7 @@ func TestLogEmergency(t *testing.T) {
 func TestRedirect(t *testing.T) {
 	app := goweb.New()
 	app.GET("/", func(c *goweb.Context) goweb.Responder {
-		return c.Redirect("/foo", http.StatusTemporaryRedirect)
+		return c.Redirect(http.StatusTemporaryRedirect, "/foo")
 	})
 	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {

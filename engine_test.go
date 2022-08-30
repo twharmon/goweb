@@ -11,7 +11,7 @@ import (
 func TestRun(t *testing.T) {
 	app := goweb.New()
 	app.GET("/", func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	})
 	go app.Run(":9999")
 	res, err := http.DefaultClient.Get("http://localhost:9999/")
@@ -27,7 +27,7 @@ func TestRun(t *testing.T) {
 
 func TestGET(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/", handler)
@@ -36,7 +36,7 @@ func TestGET(t *testing.T) {
 
 func TestPUT(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.PUT("/", handler)
@@ -45,7 +45,7 @@ func TestPUT(t *testing.T) {
 
 func TestPATCH(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.PATCH("/", handler)
@@ -54,7 +54,7 @@ func TestPATCH(t *testing.T) {
 
 func TestPOST(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.POST("/", handler)
@@ -63,7 +63,7 @@ func TestPOST(t *testing.T) {
 
 func TestDELETE(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.DELETE("/", handler)
@@ -72,7 +72,7 @@ func TestDELETE(t *testing.T) {
 
 func TestHEAD(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.HEAD("/", handler)
@@ -81,7 +81,7 @@ func TestHEAD(t *testing.T) {
 
 func TestOPTIONS(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.OPTIONS("/", handler)
@@ -90,10 +90,10 @@ func TestOPTIONS(t *testing.T) {
 
 func TestPostParamRoute(t *testing.T) {
 	wrongHandler := func(c *goweb.Context) goweb.Responder {
-		return c.BadRequest().Empty()
+		return c.Empty(http.StatusBadRequest)
 	}
 	correctHandler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/a/{b}", wrongHandler)
@@ -103,7 +103,7 @@ func TestPostParamRoute(t *testing.T) {
 
 func TestMultiParamRoute(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/a/{b}/c/{d}", handler)
@@ -112,7 +112,7 @@ func TestMultiParamRoute(t *testing.T) {
 
 func TestRouteNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/", handler)
@@ -121,19 +121,19 @@ func TestRouteNotFound(t *testing.T) {
 
 func TestCustomNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	app.GET("/", handler)
 	app.NotFound(func(c *goweb.Context) goweb.Responder {
-		return c.NotFound().Empty()
+		return c.Empty(http.StatusNotFound)
 	})
 	assert(t, app, "GET", "/foo", nil, nil, http.StatusNotFound, "")
 }
 
 func TestEmptyPath(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	assertPanic(t, func() {
@@ -143,7 +143,7 @@ func TestEmptyPath(t *testing.T) {
 
 func TestNonSlashLeadingPath(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	assertPanic(t, func() {
@@ -154,7 +154,7 @@ func TestNonSlashLeadingPath(t *testing.T) {
 func TestParams(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name"), c.Param("age"))
-		return c.Text(res)
+		return c.Text(http.StatusOK, res)
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)
@@ -164,7 +164,7 @@ func TestParams(t *testing.T) {
 func TestParamsNotFound(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
 		res := fmt.Sprintf("%s %s", c.Param("name_"), c.Param("age"))
-		return c.Text(res)
+		return c.Text(http.StatusOK, res)
 	}
 	app := goweb.New()
 	app.GET("/hello/{name}/{age}", handler)

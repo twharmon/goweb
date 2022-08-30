@@ -11,23 +11,23 @@ type todoResource struct {
 }
 
 func (t todoResource) Put(c *goweb.Context) goweb.Responder {
-	return c.Text(c.Param(t.Identifier()))
+	return c.Text(http.StatusOK, c.Param(t.Identifier()))
 }
 
 func (t todoResource) Delete(c *goweb.Context) goweb.Responder {
-	return c.Text(c.Param(t.Identifier()))
+	return c.Text(http.StatusOK, c.Param(t.Identifier()))
 }
 
 func (t todoResource) Post(c *goweb.Context) goweb.Responder {
-	return c.Text("4")
+	return c.Text(http.StatusOK, "4")
 }
 
 func (t todoResource) Index(c *goweb.Context) goweb.Responder {
-	return c.Text("index")
+	return c.Text(http.StatusOK, "index")
 }
 
 func (t todoResource) Get(c *goweb.Context) goweb.Responder {
-	return c.Text(c.Param(t.Identifier()))
+	return c.Text(http.StatusOK, c.Param(t.Identifier()))
 }
 
 func (t todoResource) Identifier() string {
@@ -52,7 +52,7 @@ func TestResourceMiddleware(t *testing.T) {
 
 	m := app.Middleware(func(c *goweb.Context) goweb.Responder {
 		if c.Param("id") == "1" {
-			return c.Text("param was one")
+			return c.Text(http.StatusOK, "param was one")
 		}
 		return nil
 	})

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/twharmon/goweb"
@@ -37,7 +38,7 @@ func isNotGopher(c *goweb.Context) goweb.Responder {
 	user := c.Get("user").(*User)
 	if strings.ToLower(user.Name) == "gopher" {
 		// return non nil Responder to terminate middleware chain
-		return c.Forbidden().Text("no gophers allowed")
+		return c.Text(http.StatusForbidden, "no gophers allowed")
 	}
 
 	// return nil to continue the middleware chain
@@ -45,11 +46,11 @@ func isNotGopher(c *goweb.Context) goweb.Responder {
 }
 
 func hello(c *goweb.Context) goweb.Responder {
-	return c.JSON(goweb.Map{
+	return c.JSON(http.StatusOK, goweb.Map{
 		"hello": "world",
 	})
 }
 
 func getUser(c *goweb.Context) goweb.Responder {
-	return c.JSON(c.Get("user"))
+	return c.JSON(http.StatusOK, c.Get("user"))
 }
