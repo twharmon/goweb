@@ -9,7 +9,7 @@ import (
 
 func TestPassThroughMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
@@ -22,11 +22,11 @@ func TestPassThroughMiddleware(t *testing.T) {
 
 func TestInterruptingMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Empty()
+		return c.Empty(http.StatusOK)
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
-		return c.BadRequest().Empty()
+		return c.Empty(http.StatusBadRequest)
 	})
 	mw.GET("/", handler)
 	assert(t, app, "GET", "/", nil, nil, http.StatusBadRequest, "")
@@ -34,7 +34,7 @@ func TestInterruptingMiddleware(t *testing.T) {
 
 func TestPUTMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
@@ -47,7 +47,7 @@ func TestPUTMiddleware(t *testing.T) {
 
 func TestPOSTMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
@@ -60,7 +60,7 @@ func TestPOSTMiddleware(t *testing.T) {
 
 func TestPATCHMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
@@ -73,7 +73,7 @@ func TestPATCHMiddleware(t *testing.T) {
 
 func TestDELETEMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
@@ -86,7 +86,7 @@ func TestDELETEMiddleware(t *testing.T) {
 
 func TestHEADMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string))
 	}
 	app := goweb.New()
 	mw := app.Middleware(func(c *goweb.Context) goweb.Responder {
@@ -99,7 +99,7 @@ func TestHEADMiddleware(t *testing.T) {
 
 func TestChainMiddleware(t *testing.T) {
 	handler := func(c *goweb.Context) goweb.Responder {
-		return c.Text(c.Get("foo").(string) + c.Get("bar").(string))
+		return c.Text(http.StatusOK, c.Get("foo").(string)+c.Get("bar").(string))
 	}
 	app := goweb.New()
 	mw1 := app.Middleware(func(c *goweb.Context) goweb.Responder {

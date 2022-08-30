@@ -1,5 +1,7 @@
 package goweb
 
+import "net/http"
+
 // Map is an alias for map[string]interface{}.
 type Map map[string]interface{}
 
@@ -10,7 +12,7 @@ type Handler func(*Context) Responder
 func New() *Engine {
 	e := &Engine{
 		notFoundHandler: func(c *Context) Responder {
-			return c.NotFound().JSON(Map{
+			return c.JSON(http.StatusNotFound, Map{
 				"message": "Page Not Found",
 			})
 		},

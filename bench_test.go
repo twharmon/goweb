@@ -2,7 +2,7 @@ package goweb_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -44,13 +44,13 @@ func init() {
 
 	gowebApp = goweb.New()
 	gowebApp.GET("/plaintext", func(c *goweb.Context) goweb.Responder {
-		return c.Text(plainTextBody)
+		return c.Text(http.StatusOK, plainTextBody)
 	})
 	gowebApp.GET("/json", func(c *goweb.Context) goweb.Responder {
-		return c.JSON(&posts)
+		return c.JSON(http.StatusOK, &posts)
 	})
 	gowebApp.GET("/params/{foo}/{bar}/{baz}", func(c *goweb.Context) goweb.Responder {
-		return c.JSON(goweb.Map{
+		return c.JSON(http.StatusOK, goweb.Map{
 			"foo": c.Param("foo"),
 			"bar": c.Param("bar"),
 			"baz": c.Param("baz"),
@@ -105,7 +105,7 @@ func init() {
 	})
 
 	martiniApp = martini.Classic()
-	martiniApp.Logger(log.New(ioutil.Discard, "", 0))
+	martiniApp.Logger(log.New(io.Discard, "", 0))
 	martiniApp.Get("/plaintext", func() string {
 		return plainTextBody
 	})

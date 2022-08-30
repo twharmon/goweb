@@ -15,61 +15,6 @@ type Context struct {
 	params         params
 	store          Map
 	loggers        []Logger
-	status         int
-}
-
-// Status sets the response status.
-func (c *Context) Status(status int) *Context {
-	c.status = status
-	return c
-}
-
-// Created sets the response status to 201.
-func (c *Context) Created() *Context {
-	c.status = http.StatusCreated
-	return c
-}
-
-// BadRequest sets the response status to 400.
-func (c *Context) BadRequest() *Context {
-	c.status = http.StatusBadRequest
-	return c
-}
-
-// Unauthorized sets the response status to 401.
-func (c *Context) Unauthorized() *Context {
-	c.status = http.StatusUnauthorized
-	return c
-}
-
-// Forbidden sets the response status to 403.
-func (c *Context) Forbidden() *Context {
-	c.status = http.StatusForbidden
-	return c
-}
-
-// NotFound sets the response status to 404.
-func (c *Context) NotFound() *Context {
-	c.status = http.StatusNotFound
-	return c
-}
-
-// Conflict sets the response status to 409.
-func (c *Context) Conflict() *Context {
-	c.status = http.StatusConflict
-	return c
-}
-
-// UnprocessableEntity sets the response status to 422.
-func (c *Context) UnprocessableEntity() *Context {
-	c.status = http.StatusUnprocessableEntity
-	return c
-}
-
-// InternalServerError sets the response status to 500.
-func (c *Context) InternalServerError() *Context {
-	c.status = http.StatusInternalServerError
-	return c
 }
 
 // Param gets a path parameter by the given name. An Empty
@@ -171,25 +116,28 @@ func (c *Context) LogEmergency(messages ...interface{}) {
 }
 
 // JSON returns a JSONResponse.
-func (c *Context) JSON(value interface{}) *JSONResponse {
+func (c *Context) JSON(statusCode int, value interface{}) *JSONResponse {
 	return &JSONResponse{
 		context: c,
 		body:    value,
+		status:  statusCode,
 	}
 }
 
 // Text returns a TextResponse.
-func (c *Context) Text(text string) *TextResponse {
+func (c *Context) Text(statusCode int, text string) *TextResponse {
 	return &TextResponse{
 		context: c,
 		body:    text,
+		status:  statusCode,
 	}
 }
 
 // Empty returns a EmptyResponse.
-func (c *Context) Empty() *EmptyResponse {
+func (c *Context) Empty(statusCode int) *EmptyResponse {
 	return &EmptyResponse{
 		context: c,
+		status:  statusCode,
 	}
 }
 
@@ -199,10 +147,10 @@ func (c *Context) Nil() *NilResponse {
 }
 
 // Redirect redirects the request.
-func (c *Context) Redirect(url string, code int) *RedirectResponse {
+func (c *Context) Redirect(statusCode int, url string) *RedirectResponse {
 	return &RedirectResponse{
 		context: c,
-		code:    code,
+		status:  statusCode,
 		url:     url,
 	}
 }

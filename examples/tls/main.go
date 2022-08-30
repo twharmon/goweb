@@ -14,7 +14,7 @@ func main() {
 	app := goweb.New()
 
 	app.GET("/", func(c *goweb.Context) goweb.Responder {
-		return c.JSON(goweb.Map{
+		return c.JSON(http.StatusOK, goweb.Map{
 			"hello": "world",
 		})
 	})

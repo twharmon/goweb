@@ -37,10 +37,10 @@ type templateResponse struct {
 func (r *templateResponse) Respond() {
 	t, err := template.New(r.path).ParseFiles("html/" + r.path)
 	if err != nil {
-		r.context.Status(http.StatusInternalServerError).Text("Unable to parse templates: " + err.Error()).Respond()
+		r.context.Text(http.StatusInternalServerError, "Unable to parse templates: "+err.Error()).Respond()
 		return
 	}
 	if err := t.Execute(r.context.ResponseWriter, r.data); err != nil {
-		r.context.Status(http.StatusInternalServerError).Text("Unable to execute templates: " + err.Error()).Respond()
+		r.context.Text(http.StatusInternalServerError, "Unable to execute templates: "+err.Error()).Respond()
 	}
 }
